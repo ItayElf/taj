@@ -1,10 +1,6 @@
-from flask import Flask, send_from_directory
-from flask_cors import CORS
-
+from flask import send_from_directory
+from taj.endpoints import app
 from taj.orm import init_db
-
-app = Flask(__name__, static_url_path="", static_folder="frontend/build")
-CORS(app)
 
 
 @app.route("/")
