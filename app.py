@@ -1,5 +1,5 @@
 from flask import send_from_directory
-from taj.endpoints import app
+from taj.endpoints import *
 from taj.orm import init_db
 
 

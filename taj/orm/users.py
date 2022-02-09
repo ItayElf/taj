@@ -1,7 +1,8 @@
+import os
 import random
 import sqlite3
 
-from taj.orm.connections import main_connection
+from taj.orm.connections import main_connection, ROOT_PATH
 from hashlib import md5
 from string import ascii_letters, digits, punctuation
 
@@ -27,8 +28,14 @@ def insert_user(name: str, password: str) -> None:
     try:
         salt = "".join(random.choices(_pool, k=8))
         password = md5((password + salt).encode()).hexdigest()
-        conn.execute("INSERT INTO users(name, password, salt) VALUES(?, ?, ?)", (name, password, salt))
+        conn.execute("INSERT INTO users(username, password, salt) VALUES(?, ?, ?)", (name, password, salt))
+        if not os.path.isdir(os.path.join(ROOT_PATH, "dbs", "users", name)):
+            os.mkdir(os.path.join(ROOT_PATH, "dbs", "users", name))
+        conn.commit()
     except sqlite3.IntegrityError:
         conn.close()
         raise FileExistsError(f"The username {name} is already taken.")
+    except OSError:
+        conn.close()
+        raise ValueError("Invalid username")
     conn.close()
