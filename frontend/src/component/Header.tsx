@@ -1,0 +1,65 @@
+interface Props {
+  username: string;
+}
+
+export default function Header({ username }: Props) {
+  return (
+    <nav className="bg-secondary-dark w-full">
+      <div className="relative flex h-16 items-center justify-between px-8">
+        <div className="flex flex-shrink-0 items-center space-x-8">
+          {/* TODO: add logo */}
+          <a href="#" className="text-5xl font-bold">
+            Taj
+          </a>
+          <div className="flex space-x-4">
+            <a
+              href="#"
+              className="bg-secondary-dark hover:bg-secondary-semi-dark rounded-md px-3 py-2 text-lg font-medium"
+            >
+              Home
+            </a>
+            <a
+              href="#"
+              className="bg-secondary-dark hover:bg-secondary-semi-dark rounded-md px-3 py-2 text-lg font-medium"
+            >
+              Explore
+            </a>
+          </div>
+        </div>
+        <div className="flex flex-shrink-0 items-center space-x-8">
+          <div className="bg-secondary-semi-dark flex rounded">
+            <div className="flex items-center justify-center pl-1">
+              <svg
+                className="h-6 w-6 "
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path>
+              </svg>
+            </div>
+            <input
+              type="text"
+              name="search"
+              id="search"
+              placeholder="Search..."
+              className=" placeholder-primary-dark bg-secondary-semi-dark w-60 border-none focus:ring-transparent"
+            />
+          </div>
+          {!!username ? (
+            <div></div>
+          ) : (
+            <div className="flex flex-shrink-0 space-x-6">
+              <button className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 font-semibold">
+                Sign In
+              </button>
+              <button className="bg-primary hover:bg-primary-light rounded py-2 px-4 font-bold">
+                Sign Up
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
