@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 
 function App() {
   return (
-    <div>
+    <div className="h-full w-full">
       <Header username="" />
       <Home />
       <Footer />
