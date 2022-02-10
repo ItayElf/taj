@@ -3,3 +3,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .clip-path-slash {
+    clip-path: polygon(3rem 0, 100% 0, 100% 100%, 0 100%);
+    shape-outside: polygon(3rem 0, 100% 0, 100% 100%, 0 100%);
+  }
+}

@@ -53,7 +53,7 @@ export default function Header({ username }: Props) {
               <button className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 font-semibold">
                 Sign In
               </button>
-              <button className="bg-primary hover:bg-primary-light rounded py-2 px-4 font-bold">
+              <button className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white">
                 Sign Up
               </button>
             </div>
