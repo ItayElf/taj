@@ -12,8 +12,9 @@ module.exports = {
         secondary: {
           light: "#fff9e3",
           DEFAULT: "#fbe8a6",
-          "semi-dark": "#f6b292",
-          dark: "#f4976c",
+          "semi-dark": "#fac58c",
+          dark: "#fbba73",
+          "extra-dark": "#f4976c",
         },
       },
       fontFamily: {

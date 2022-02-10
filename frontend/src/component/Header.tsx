@@ -8,12 +8,12 @@ export default function Header({ username }: Props) {
       <div className="relative flex h-16 items-center justify-between px-8">
         <div className="flex flex-shrink-0 items-center space-x-8">
           {/* TODO: add logo */}
-          <a href="#" className="text-5xl font-bold">
+          <a href="/" className="text-5xl font-bold">
             Taj
           </a>
           <div className="flex space-x-4">
             <a
-              href="#"
+              href="/"
               className="bg-secondary-dark hover:bg-secondary-semi-dark rounded-md px-3 py-2 text-lg font-medium"
             >
               Home
@@ -27,7 +27,7 @@ export default function Header({ username }: Props) {
           </div>
         </div>
         <div className="flex flex-shrink-0 items-center space-x-8">
-          <div className="bg-secondary-semi-dark flex rounded">
+          <div className="bg-secondary-semi-dark flex rounded-lg">
             <div className="flex items-center justify-center pl-1">
               <svg
                 className="h-6 w-6 "
@@ -43,7 +43,7 @@ export default function Header({ username }: Props) {
               name="search"
               id="search"
               placeholder="Search..."
-              className=" placeholder-primary-dark bg-secondary-semi-dark w-60 border-none focus:ring-transparent"
+              className=" placeholder-primary-dark bg-secondary-semi-dark w-60 rounded-lg border-none focus:ring-transparent"
             />
           </div>
           {!!username ? (
