@@ -6,17 +6,21 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
+import { store } from "./redux/store";
+import { Provider } from "react-redux";
 
 ReactDOM.render(
-  <BrowserRouter>
-    <React.StrictMode>
-      <Header username="" />
-      <Routes>
-        <Route path="/" element={<App />} />
-      </Routes>
-      <Footer />
-    </React.StrictMode>
-  </BrowserRouter>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <React.StrictMode>
+        <Header />
+        <Routes>
+          <Route path="/" element={<App />} />
+        </Routes>
+        <Footer />
+      </React.StrictMode>
+    </BrowserRouter>
+  </Provider>,
   document.getElementById("root")
 );
 

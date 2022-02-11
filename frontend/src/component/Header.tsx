@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../redux/hooks";
 
-interface Props {
-  username: string;
-}
-
-export default function Header({ username }: Props) {
+export default function Header() {
+  const { username } = useAppSelector((state) => state.userData);
   return (
     <nav className="bg-secondary-dark w-full">
       <div className="relative flex h-16 items-center justify-between px-8">
