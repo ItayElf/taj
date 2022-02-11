@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 interface Props {
   username: string;
 }
@@ -8,22 +10,22 @@ export default function Header({ username }: Props) {
       <div className="relative flex h-16 items-center justify-between px-8">
         <div className="flex flex-shrink-0 items-center space-x-8">
           {/* TODO: add logo */}
-          <a href="/" className="text-5xl font-bold">
+          <Link to="/" className="text-5xl font-bold">
             Taj
-          </a>
+          </Link>
           <div className="flex space-x-4">
-            <a
-              href="/"
+            <Link
+              to="/"
               className="bg-secondary-dark hover:bg-secondary-semi-dark rounded-md px-3 py-2 text-lg font-medium"
             >
               Home
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="bg-secondary-dark hover:bg-secondary-semi-dark rounded-md px-3 py-2 text-lg font-medium"
             >
               Explore
-            </a>
+            </Link>
           </div>
         </div>
         <div className="flex flex-shrink-0 items-center space-x-8">
@@ -50,12 +52,18 @@ export default function Header({ username }: Props) {
             <div></div>
           ) : (
             <div className="flex flex-shrink-0 space-x-6">
-              <button className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 font-semibold">
+              <Link
+                to="#"
+                className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 font-semibold"
+              >
                 Sign In
-              </button>
-              <button className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white">
+              </Link>
+              <Link
+                to="#"
+                className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white"
+              >
                 Sign Up
-              </button>
+              </Link>
             </div>
           )}
         </div>
