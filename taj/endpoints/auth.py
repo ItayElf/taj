@@ -1,8 +1,6 @@
-import json
-
 from taj.endpoints import app
 from taj.orm.users import validate_user, insert_user
-from flask import request
+from flask import request, jsonify
 
 
 @app.route("/api/auth/login")
@@ -12,9 +10,9 @@ def auth_login():
     username = request.args.get("username")
     password = request.args.get("password")
     try:
-        return json.dumps(validate_user(username, password))
+        return jsonify(validate_user(username, password))
     except FileNotFoundError:
-        return json.dumps(False)
+        return jsonify(False)
 
 
 @app.route("/api/auth/register", methods=["POST"])
