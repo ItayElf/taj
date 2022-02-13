@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
+import Logo from "./Logo";
 
 export default function Header() {
   const { username } = useAppSelector((state) => state.userData);
@@ -7,9 +8,13 @@ export default function Header() {
     <nav className="bg-secondary-dark w-full">
       <div className="relative flex h-16 items-center justify-between px-8">
         <div className="flex flex-shrink-0 items-center space-x-8">
-          {/* TODO: add logo */}
           <Link to="/" className="text-5xl font-bold">
-            Taj
+            <div className="flex">
+              <Logo width={75} />
+              <span className="font-cinzel text-primary pl-2 pt-2 text-5xl">
+                Taj
+              </span>
+            </div>
           </Link>
           <div className="flex space-x-4">
             <Link

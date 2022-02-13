@@ -20,6 +20,7 @@ module.exports = {
       },
       fontFamily: {
         roboto: ["Roboto"],
+        cinzel: ["Cinzel Decorative"],
       },
     },
   },
