@@ -1,5 +1,7 @@
 # Project specifics
 dbs/
+cert.pem
+key.pem
 
 # Logs
 frontend/logs
