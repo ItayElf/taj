@@ -4,20 +4,22 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import Header from "./component/Header";
-import Footer from "./component/Footer";
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
+import Auth from "./pages/Auth";
 
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <React.StrictMode>
-        <Header />
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/signIn" element={<Auth signIn key="signIn" />} />
+          <Route
+            path="/signUp"
+            element={<Auth signIn={false} key="signUp" />}
+          />
         </Routes>
-        <Footer />
       </React.StrictMode>
     </BrowserRouter>
   </Provider>,

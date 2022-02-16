@@ -56,13 +56,13 @@ export default function Header() {
           ) : (
             <div className="flex flex-shrink-0 space-x-6">
               <Link
-                to="#"
+                to="/signIn"
                 className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 font-semibold"
               >
                 Sign In
               </Link>
               <Link
-                to="#"
+                to="/signUp"
                 className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white"
               >
                 Sign Up

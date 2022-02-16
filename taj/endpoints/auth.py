@@ -17,10 +17,10 @@ def auth_login():
 
 @app.route("/api/auth/register", methods=["POST"])
 def auth_register():
-    if "username" not in request.form or "password" not in request.form:
+    if "username" not in request.json or "password" not in request.json:
         return "Missing username or password in form", 400
-    username = request.form.get("username")
-    password = request.form.get("password")
+    username = request.json.get("username")
+    password = request.json.get("password")
     try:
         insert_user(username, password)
         return "", 200
