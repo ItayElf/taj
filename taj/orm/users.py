@@ -17,10 +17,10 @@ def validate_user(name: str, password: str) -> bool:
     c = conn.cursor()
     c.execute("SELECT password, salt FROM users WHERE username=?", (name,))
     tup = c.fetchone()
+    conn.close()
     if not tup:
         raise FileNotFoundError(f"No user named {name}")
     res = md5((password + tup[1]).encode()).hexdigest() == tup[0]
-    conn.close()
     return res
 
 
@@ -50,8 +50,19 @@ def get_profile_pic(name: str = "", idx: int = -1) -> bytes:
     c = conn.cursor()
     c.execute("SELECT profile_pic FROM users WHERE username=? OR id=?", (name, idx))
     tup = c.fetchone()
+    conn.close()
     if not tup:
         raise FileNotFoundError(f"No user named {name} or with index {idx}")
     if tup[0]:
         return zlib.decompress(tup[0])
     return open(_blank_profile_path, "rb").read()
+
+
+def does_user_exist(name: str) -> bool:
+    """Returns whether a user with the given username exists"""
+    conn = main_connection()
+    c = conn.cursor()
+    c.execute("SELECT username FROM users WHERE username=?", (name,))
+    tup = c.fetchone()
+    conn.close()
+    return not not tup

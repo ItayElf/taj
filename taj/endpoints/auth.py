@@ -1,5 +1,5 @@
 from taj.endpoints import app
-from taj.orm.users import validate_user, insert_user
+from taj.orm.users import validate_user, insert_user, does_user_exist
 from flask import request, jsonify
 
 
@@ -28,3 +28,11 @@ def auth_register():
         return "Username is already taken", 406
     except ValueError as e:
         return str(e), 400
+
+
+@app.route("/api/auth/user_exists")
+def auth_user_exists():
+    if "username" not in request.args:
+        return "Missing username in args", 400
+    username = request.args.get("username")
+    return jsonify(does_user_exist(username))

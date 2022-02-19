@@ -16,7 +16,13 @@ def serve(path):
         return send_from_directory(build_path, "index.html")
 
 
-@app.route("/<user>/profile_pic")
+@app.errorhandler(404)
+def not_found(_):
+    build_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "build")
+    return send_from_directory(build_path, "index.html")
+
+
+@app.route("/user/<user>/profile_pic")
 def user_profile_pic(user):
     try:
         image = get_profile_pic(name=user)

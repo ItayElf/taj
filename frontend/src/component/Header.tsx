@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../redux/hooks";
+import { getInitial, useAppSelector } from "../redux/hooks";
 import Logo from "./Logo";
 
 export default function Header() {
-  const { username } = useAppSelector((state) => state.userData);
+  // const { username } = useAppSelector((state) => state.userData);
+  const [username, setUsername] = useState(getInitial<string>("username"));
   return (
     <nav className="bg-secondary-dark w-full">
       <div className="relative flex h-16 items-center justify-between px-8">
@@ -52,7 +54,21 @@ export default function Header() {
             />
           </div>
           {!!username ? (
-            <div></div>
+            <div className="flex flex-shrink-0 space-x-6">
+              <Link
+                to="#"
+                className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white"
+              >
+                New Repo
+              </Link>
+              <Link to={`/user/${username}`}>
+                <img
+                  src={`/user/${username}/profile_pic`}
+                  className="h-10 w-10 rounded-full"
+                  alt={`${username}'s profile`}
+                />
+              </Link>
+            </div>
           ) : (
             <div className="flex flex-shrink-0 space-x-6">
               <Link

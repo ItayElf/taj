@@ -7,6 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -19,6 +20,7 @@ ReactDOM.render(
             path="/signUp"
             element={<Auth signIn={false} key="signUp" />}
           />
+          <Route path="/user/:username" element={<Profile />} />
         </Routes>
       </React.StrictMode>
     </BrowserRouter>

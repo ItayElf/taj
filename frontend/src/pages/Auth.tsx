@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../component/Logo";
 import { apiUrl } from "../constants";
 import { useAppDispatch } from "../redux/hooks";
@@ -17,6 +17,7 @@ export default function Auth({ signIn }: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,6 +40,7 @@ export default function Auth({ signIn }: Props) {
       dispatch(setUsernameAction(username));
       dispatch(setPasswordAction(password));
     }
+    navigate(`/user/${username}`);
   };
 
   return (
