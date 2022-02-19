@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username text NOT NULL UNIQUE,
     password text NOT NULL,
-    salt text NOT NULL
+    salt text NOT NULL,
+    profile_pic BLOB
 );
 """
 

@@ -1,7 +1,9 @@
 import os
-from flask import send_from_directory
+import io
+from flask import send_from_directory, send_file
 from taj.endpoints import *
 from taj.orm import init_db
+from taj.orm.users import get_profile_pic
 
 
 @app.route("/", defaults={'path': ''})
@@ -12,6 +14,15 @@ def serve(path):
         return send_from_directory(build_path, path)
     else:
         return send_from_directory(build_path, "index.html")
+
+
+@app.route("/<user>/profile_pic")
+def user_profile_pic(user):
+    try:
+        image = get_profile_pic(name=user)
+        return send_file(io.BytesIO(image), mimetype="image/jpg")
+    except FileNotFoundError as e:
+        return str(e), 404
 
 
 if __name__ == "__main__":
