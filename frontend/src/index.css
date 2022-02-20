@@ -19,4 +19,7 @@ body,
   .h-full-main {
     height: calc(100vh - 137.05px);
   }
+  .min-h-full-main {
+    min-height: calc(100vh - 137.05px);
+  }
 }

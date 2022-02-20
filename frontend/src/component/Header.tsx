@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiUrl } from "../constants";
-import { getInitial, useAppSelector } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import { get } from "../utils/fetchUtils";
 import Logo from "./Logo";
 
@@ -74,7 +74,7 @@ export default function Header() {
             <div className="flex flex-shrink-0 space-x-6">
               <Link
                 to="#"
-                className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white"
+                className="bg-primary hover:bg-primary/80 rounded py-2 px-4 text-center font-bold text-white"
               >
                 New Repo
               </Link>
@@ -90,13 +90,13 @@ export default function Header() {
             <div className="flex flex-shrink-0 space-x-6">
               <Link
                 to="/signIn"
-                className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 font-semibold"
+                className="hover:bg-secondary-semi-dark rounded bg-transparent py-2 px-4 text-center font-semibold"
               >
                 Sign In
               </Link>
               <Link
                 to="/signUp"
-                className="bg-primary hover:bg-primary/80 rounded py-2 px-4 font-bold text-white"
+                className="bg-primary hover:bg-primary/80 rounded py-2 px-4 text-center font-bold text-white"
               >
                 Sign Up
               </Link>
