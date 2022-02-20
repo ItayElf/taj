@@ -1,11 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiUrl } from "../constants";
 import { getInitial, useAppSelector } from "../redux/hooks";
+import { get } from "../utils/fetchUtils";
 import Logo from "./Logo";
 
 export default function Header() {
-  // const { username } = useAppSelector((state) => state.userData);
-  const [username, setUsername] = useState(getInitial<string>("username"));
+  const { username, token } = useAppSelector((state) => state.userData);
+  // const username = getInitial<string>("username");
+  // const token = getInitial<string>("token");
+  const [logged, setLogged] = useState(false);
+  useEffect(() => {
+    if (!username || !token) {
+      return;
+    }
+    (async () => {
+      const res = await get(apiUrl + "auth/validate_token", {
+        username,
+        token,
+      });
+      setLogged(JSON.parse(await res.text()));
+    })();
+  }, [token, username]);
+
   return (
     <nav className="bg-secondary-dark w-full">
       <div className="relative flex h-16 items-center justify-between px-8">
@@ -53,7 +70,7 @@ export default function Header() {
               className=" placeholder-primary-dark bg-secondary-semi-dark w-60 rounded-lg border-none focus:ring-transparent"
             />
           </div>
-          {!!username ? (
+          {logged ? (
             <div className="flex flex-shrink-0 space-x-6">
               <Link
                 to="#"

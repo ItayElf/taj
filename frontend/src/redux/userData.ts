@@ -1,15 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { getInitial } from "./hooks";
 
 interface userData {
   username: string;
   token: string;
-  idx: number;
 }
 
 const initialState: userData = {
-  username: "",
-  token: "",
-  idx: -1,
+  username: getInitial<string>("username") || "",
+  token: getInitial<string>("token") || "",
 };
 
 export const userDataSlice = createSlice({
@@ -24,12 +23,8 @@ export const userDataSlice = createSlice({
       state.token = action.payload;
       localStorage.setItem("token", JSON.stringify(action.payload));
     },
-    setIdx: (state, action: PayloadAction<number>) => {
-      state.idx = action.payload;
-      localStorage.setItem("idx", JSON.stringify(action.payload));
-    },
   },
 });
 
-export const { setUsername, setToken, setIdx } = userDataSlice.actions;
+export const { setUsername, setToken } = userDataSlice.actions;
 export default userDataSlice.reducer;

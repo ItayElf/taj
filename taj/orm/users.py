@@ -8,7 +8,7 @@ from taj.orm.connections import main_connection, ROOT_PATH
 from hashlib import md5
 from string import ascii_letters, digits, punctuation
 
-_pool = ascii_letters + digits + punctuation
+_pool = ascii_letters + digits
 _blank_profile_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blank profile.jpg")
 _interval = 172800  # Two hours
 
