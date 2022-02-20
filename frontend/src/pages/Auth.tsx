@@ -6,7 +6,7 @@ import { useAppDispatch } from "../redux/hooks";
 import { get, post } from "../utils/fetchUtils";
 import {
   setUsername as setUsernameAction,
-  setPassword as setPasswordAction,
+  setToken as setTokenAction,
 } from "../redux/userData";
 
 interface Props {
@@ -24,21 +24,23 @@ export default function Auth({ signIn }: Props) {
     e.preventDefault();
     if (signIn) {
       const res = await get(apiUrl + "auth/login", { username, password });
-      if (!JSON.parse(await res.text())) {
+      const text = JSON.parse(await res.text());
+      if (!text) {
         setError("Username or password are not correct.");
         return;
       }
       dispatch(setUsernameAction(username));
-      dispatch(setPasswordAction(password));
+      dispatch(setTokenAction(text));
     } else {
       const res = await post(apiUrl + "auth/register", { username, password });
       console.log(res.status);
+      const text = await res.text();
       if (res.status !== 200) {
-        setError(await res.text());
+        setError(text);
         return;
       }
       dispatch(setUsernameAction(username));
-      dispatch(setPasswordAction(password));
+      dispatch(setTokenAction(text));
     }
     navigate(`/user/${username}`);
   };

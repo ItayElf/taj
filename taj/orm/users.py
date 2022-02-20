@@ -1,6 +1,7 @@
 import os
 import random
 import sqlite3
+import time
 import zlib
 
 from taj.orm.connections import main_connection, ROOT_PATH
@@ -9,6 +10,14 @@ from string import ascii_letters, digits, punctuation
 
 _pool = ascii_letters + digits + punctuation
 _blank_profile_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blank profile.jpg")
+_interval = 172800  # Two hours
+
+_insert_token = """
+INSERT INTO tokens(user_id, token, tstamp)
+SELECT u.id, ?, ?
+FROM users u
+WHERE u.username = ?;
+"""
 
 
 def validate_user(name: str, password: str) -> bool:
@@ -66,3 +75,45 @@ def does_user_exist(name: str) -> bool:
     tup = c.fetchone()
     conn.close()
     return not not tup
+
+
+def add_token_if_not_exists(name: str) -> str:
+    """Adds a token for a user if the user has no other token and return it"""
+    done = False
+    conn = main_connection()
+    c = conn.cursor()
+    c.execute(
+        "SELECT token, tstamp FROM tokens JOIN users u ON u.id=tokens.user_id WHERE u.username=? ORDER BY tstamp DESC",
+        (name,))
+    tup = c.fetchone()
+    if tup and tup[1] > time.time():
+        return tup[0]
+    while not done:
+        t = _generate_token()
+        tstamp = int(time.time()) + _interval
+        try:
+            conn.execute(_insert_token, (t, tstamp, name))
+            conn.commit()
+            conn.close()
+            done = True
+            return t
+        except sqlite3.IntegrityError:
+            ...
+
+
+def validate_token(name: str, token: str) -> bool:
+    """Returns true if the given token matches the given user and is not expired"""
+    conn = main_connection()
+    c = conn.cursor()
+    c.execute("SELECT token, tstamp FROM tokens JOIN users u ON u.id = tokens.user_id WHERE u.username=?", (name,))
+    lst = c.fetchall()
+    now = time.time()
+    for (t, tstamp) in lst:
+        if t == token and tstamp > now:
+            return True
+    return False
+
+
+def _generate_token() -> str:
+    """Returns a random string for auth token"""
+    return "".join(random.choices(_pool, k=16))

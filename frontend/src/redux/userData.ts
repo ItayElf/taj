@@ -2,13 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface userData {
   username: string;
-  password: string;
+  token: string;
   idx: number;
 }
 
 const initialState: userData = {
   username: "",
-  password: "",
+  token: "",
   idx: -1,
 };
 
@@ -20,9 +20,9 @@ export const userDataSlice = createSlice({
       state.username = action.payload;
       localStorage.setItem("username", JSON.stringify(action.payload));
     },
-    setPassword: (state, action: PayloadAction<string>) => {
-      state.password = action.payload;
-      localStorage.setItem("password", JSON.stringify(action.payload));
+    setToken: (state, action: PayloadAction<string>) => {
+      state.token = action.payload;
+      localStorage.setItem("token", JSON.stringify(action.payload));
     },
     setIdx: (state, action: PayloadAction<number>) => {
       state.idx = action.payload;
@@ -31,5 +31,5 @@ export const userDataSlice = createSlice({
   },
 });
 
-export const { setUsername, setPassword, setIdx } = userDataSlice.actions;
+export const { setUsername, setToken, setIdx } = userDataSlice.actions;
 export default userDataSlice.reducer;

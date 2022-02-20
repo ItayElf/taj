@@ -1,5 +1,5 @@
 from taj.endpoints import app
-from taj.orm.users import validate_user, insert_user, does_user_exist
+from taj.orm.users import validate_user, insert_user, does_user_exist, validate_token, add_token_if_not_exists
 from flask import request, jsonify
 
 
@@ -10,7 +10,10 @@ def auth_login():
     username = request.args.get("username")
     password = request.args.get("password")
     try:
-        return jsonify(validate_user(username, password))
+        if validate_user(username, password):
+            t = add_token_if_not_exists(username)
+            return jsonify(t)
+        return jsonify(False)
     except FileNotFoundError:
         return jsonify(False)
 
@@ -23,7 +26,8 @@ def auth_register():
     password = request.json.get("password")
     try:
         insert_user(username, password)
-        return "", 200
+        t = add_token_if_not_exists(username)
+        return jsonify(t)
     except FileExistsError:
         return "Username is already taken", 406
     except ValueError as e:
@@ -36,3 +40,14 @@ def auth_user_exists():
         return "Missing username in args", 400
     username = request.args.get("username")
     return jsonify(does_user_exist(username))
+
+
+@app.route("/api/auth/validate_token")
+def auth_validate_token():
+    if "username" not in request.args or "token" not in request.args:
+        return "Missing username or token in args", 400
+    username = request.args.get("username")
+    token = request.args.get("token")
+    if not does_user_exist(username):
+        return f"User {username} was not found", 404
+    return jsonify(validate_token(username, token))

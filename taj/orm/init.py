@@ -9,6 +9,12 @@ CREATE TABLE IF NOT EXISTS users(
     salt text NOT NULL,
     profile_pic BLOB
 );
+CREATE TABLE IF NOT EXISTS tokens(
+    user_id INTEGER NOT NULL,
+    token text NOT NULL UNIQUE,
+    tstamp INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 """
 
 
