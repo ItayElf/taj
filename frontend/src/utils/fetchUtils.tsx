@@ -1,6 +1,5 @@
 export function get(url: string, params: {}) {
   url += "?" + new URLSearchParams(params).toString();
-  console.log(url);
   return fetch(url, { method: "GET" });
 }
 

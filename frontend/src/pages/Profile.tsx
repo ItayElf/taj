@@ -3,14 +3,17 @@ import { Link, useParams } from "react-router-dom";
 import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";
+import RepoTile from "../component/RepoTile";
 import { apiUrl } from "../constants";
 import { useAppSelector } from "../redux/hooks";
 import { get } from "../utils/fetchUtils";
+import { Repo } from "../utils/interfaces";
 
 export default function Profile() {
   const [found, setFound] = useState<boolean | null>(null);
   const [same, setSame] = useState(false);
   const [repo, setRepo] = useState("");
+  const [repos, setRepos] = useState<Repo[]>([]);
   const { username } = useParams();
   const { username: loggedUser, token } = useAppSelector(
     (state) => state.userData
@@ -34,11 +37,21 @@ export default function Profile() {
         });
         const text = await res.text();
         setSame(JSON.parse(text));
-        console.table({ text, parsed: JSON.parse(text) });
       }
     }
     checkUser();
   }, [username, loggedUser, token]);
+
+  useEffect(() => {
+    async function getRepos() {
+      if (found) {
+        const res = await get(apiUrl + "repos/of/" + username, {});
+        const text = await res.text();
+        setRepos(JSON.parse(text) as Repo[]);
+      }
+    }
+    getRepos();
+  }, [found, username]);
 
   if (found === null) {
     return (
@@ -65,7 +78,7 @@ export default function Profile() {
   return (
     <div>
       <Header />
-      <div className="min-h-full-main container mx-auto flex justify-center space-x-4 pt-8">
+      <div className="min-h-full-main container mx-auto flex justify-center space-x-6 pt-8">
         <div className="flex w-80 flex-col space-y-2">
           <img
             src={`/user/${username}/profile_pic`}
@@ -105,22 +118,31 @@ export default function Profile() {
             )}
           </div>
           <div>
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <h2 className="mt-12 text-center text-3xl">
-                {same ? "You don't" : `${username} doesn't`} have any
-                repositories yet!
-              </h2>
-              {same ? (
-                <Link
-                  to="#"
-                  className="bg-primary hover:bg-primary/80 w-32 rounded py-2 px-4 text-center font-bold text-white"
-                >
-                  New Repo
-                </Link>
-              ) : (
+            {!repos ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <h2 className="mt-12 text-center text-3xl">
+                  {same ? "You don't" : `${username} doesn't`} have any
+                  repositories yet!
+                </h2>
+                {same ? (
+                  <Link
+                    to="#"
+                    className="bg-primary hover:bg-primary/80 w-32 rounded py-2 px-4 text-center font-bold text-white"
+                  >
+                    New Repo
+                  </Link>
+                ) : (
+                  <div></div>
+                )}
+              </div>
+            ) : (
+              <div className="divide-secondary flex flex-col divide-y">
+                {repos.map((repo) => (
+                  <RepoTile repo={repo} key={repo.name} />
+                ))}
                 <div></div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

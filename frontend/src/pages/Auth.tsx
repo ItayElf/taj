@@ -33,7 +33,6 @@ export default function Auth({ signIn }: Props) {
       dispatch(setTokenAction(text));
     } else {
       const res = await post(apiUrl + "auth/register", { username, password });
-      console.log(res.status);
       const text = await res.text();
       if (res.status !== 200) {
         setError(text);

@@ -22,16 +22,6 @@ JOIN users u2 ON u2.id = r.creator_id
 GROUP BY r.name;
 """
 
-_get_repos_of = """
-SELECT r.name, r.description, u2.username ,GROUP_CONCAT(u.username) 
-FROM repos r 
-JOIN users_repos ur ON ur.repo_id = r.id
-JOIN users u ON ur.user_id = u.id
-JOIN users u2 ON u2.id = r.creator_id 
-WHERE u.username=?
-GROUP BY r.name;
-"""
-
 
 def get_repo(name: str) -> Repo:
     """Returns a repo based on its name"""
@@ -55,8 +45,4 @@ def get_all_repos() -> List[Repo]:
 
 def get_repos_of(name: str) -> List[Repo]:
     """Returns all repos for specific user"""
-    conn = main_connection()
-    c = conn.cursor()
-    c.execute(_get_repos_of, (name,))
-    lst = c.fetchall()
-    return [Repo(tup[0], tup[1], tup[2], tup[3].split(",")) for tup in lst]
+    return [r for r in get_all_repos() if name in r.contributors]
