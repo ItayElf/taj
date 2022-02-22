@@ -15,6 +15,19 @@ CREATE TABLE IF NOT EXISTS tokens(
     tstamp INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS repos(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    creator_id INTEGER NOT NULL,
+    name text NOT NULL UNIQUE,
+    description text NOT NULL,
+    FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS users_repos(
+    user_id INTEGER NOT NULL,
+    repo_id INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(repo_id) REFERENCES repos(id) ON DELETE CASCADE
+);
 """
 
 
