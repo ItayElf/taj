@@ -2,6 +2,7 @@ import sqlite3
 from typing import List
 
 from taj.orm.classes import Commit
+from taj.orm.file_change import get_all_changes_commit
 
 _get_all_commits_sql = """
 SELECT id, author, message, last_hash, "timestamp"
