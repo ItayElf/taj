@@ -6,7 +6,6 @@ interface Props {
 }
 
 export default function RepoTile({ repo }: Props) {
-  console.log(repo);
   return (
     <div className="my-2 flex flex-col">
       <Link to="#" className="text-primary text-xl font-bold">
