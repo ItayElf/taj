@@ -46,3 +46,5 @@ def get_all_repos() -> List[Repo]:
 def get_repos_of(name: str) -> List[Repo]:
     """Returns all repos for specific user"""
     return [r for r in get_all_repos() if name in r.contributors]
+
+# def get_files(repo: str, directory: str = ".") -> List[bytes]:
