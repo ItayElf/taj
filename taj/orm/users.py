@@ -107,6 +107,7 @@ def validate_token(name: str, token: str) -> bool:
     c = conn.cursor()
     c.execute("SELECT token, tstamp FROM tokens JOIN users u ON u.id = tokens.user_id WHERE u.username=?", (name,))
     lst = c.fetchall()
+    conn.close()
     now = time.time()
     for (t, tstamp) in lst:
         if t == token and tstamp > now:

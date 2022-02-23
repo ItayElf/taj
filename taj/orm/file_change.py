@@ -1,8 +1,9 @@
+import os
 import sqlite3
 import zlib
-from typing import List
+from typing import List, Dict
 
-from taj.orm.classes import FileChange, CFSimplified
+from taj.orm.classes import FileChange, CFSimplified, Commit
 
 _get_file_sql = """
 SELECT fc.name, cb.changes, fc.is_full 
@@ -31,6 +32,14 @@ _get_changes_prior_to = """
 SELECT fc.name, cb.changes, fc.is_full
 FROM file_changes fc
 INNER JOIN change_blobs cb ON cb.id=fc.change_id
+INNER JOIN commits cm ON cm.id=fc.commit_id
+WHERE cm."timestamp" <= ?
+ORDER BY cm."timestamp" DESC;
+"""
+
+_get_file_change_commit = """
+SELECT fc.name, cm.hash
+FROM file_changes fc
 INNER JOIN commits cm ON cm.id=fc.commit_id
 WHERE cm."timestamp" <= ?
 ORDER BY cm."timestamp" DESC;
@@ -90,6 +99,19 @@ def get_all_changes_prior_to(conn: sqlite3.Connection, timestamp: int) -> List[F
 def get_all_file_changes(conn: sqlite3.Connection) -> List[FileChange]:
     """Returns all file changes"""
     return get_all_changes_prior_to(conn, 9223372036854775807)
+
+
+def get_last_update_commit(conn: sqlite3.Connection, timestamp: int = 9223372036854775807) -> Dict[str, Commit]:
+    """Returns a dict with filenames as keys and last commit as value, prior to a different commit"""
+    from taj.orm.commit import get_commit_by_hash
+    res = {}
+    c = conn.cursor()
+    c.execute(_get_file_change_commit, (timestamp,))
+    lst = c.fetchall()
+    for tup in lst:
+        if os.path.normpath(tup[0]) not in res:
+            res[os.path.normpath(tup[0])] = get_commit_by_hash(conn, tup[1])
+    return res
 
 
 def get_full_file_content(changes: List[FileChange]) -> bytes:
