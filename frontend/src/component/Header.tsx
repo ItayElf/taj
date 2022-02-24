@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiUrl } from "../constants";
 import { useAppSelector } from "../redux/hooks";
-import { get } from "../utils/fetchUtils";
+import { post } from "../utils/fetchUtils";
 import Logo from "./Logo";
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
       return;
     }
     (async () => {
-      const res = await get(apiUrl + "auth/validate_token", {
+      const res = await post(apiUrl + "auth/validate_token", {
         username,
         token,
       });

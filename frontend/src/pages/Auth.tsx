@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../component/Logo";
 import { apiUrl } from "../constants";
 import { useAppDispatch } from "../redux/hooks";
-import { get, post } from "../utils/fetchUtils";
+import { post } from "../utils/fetchUtils";
 import {
   setUsername as setUsernameAction,
   setToken as setTokenAction,
@@ -23,7 +23,7 @@ export default function Auth({ signIn }: Props) {
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (signIn) {
-      const res = await get(apiUrl + "auth/login", { username, password });
+      const res = await post(apiUrl + "auth/login", { username, password });
       const text = JSON.parse(await res.text());
       if (!text) {
         setError("Username or password are not correct.");

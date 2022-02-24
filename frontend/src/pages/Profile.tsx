@@ -6,7 +6,7 @@ import NotFound from "../component/NotFound";
 import RepoTile from "../component/RepoTile";
 import { apiUrl } from "../constants";
 import { useAppSelector } from "../redux/hooks";
-import { get } from "../utils/fetchUtils";
+import { get, post } from "../utils/fetchUtils";
 import { Repo } from "../utils/interfaces";
 
 export default function Profile() {
@@ -31,7 +31,7 @@ export default function Profile() {
         return;
       }
       if (loggedUser === username) {
-        const res = await get(apiUrl + "auth/validate_token", {
+        const res = await post(apiUrl + "auth/validate_token", {
           username,
           token,
         });
