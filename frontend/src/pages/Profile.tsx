@@ -14,6 +14,7 @@ export default function Profile() {
   const [same, setSame] = useState(false);
   const [repo, setRepo] = useState("");
   const [repos, setRepos] = useState<Repo[]>([]);
+  const [shownRepos, setShownRepos] = useState<Repo[]>([]);
   const { username } = useParams();
   const { username: loggedUser, token } = useAppSelector(
     (state) => state.userData
@@ -22,7 +23,7 @@ export default function Profile() {
   useEffect(() => {
     async function checkUser() {
       const res = await get(apiUrl + "auth/user_exists", {
-        username: username,
+        username,
       });
       try {
         setFound(JSON.parse(await res.text()));
@@ -48,6 +49,7 @@ export default function Profile() {
         const res = await get(apiUrl + "repos/of/" + username, {});
         const text = await res.text();
         setRepos(JSON.parse(text) as Repo[]);
+        setShownRepos(JSON.parse(text) as Repo[]);
       }
     }
     getRepos();
@@ -104,7 +106,12 @@ export default function Profile() {
               value={repo}
               placeholder="Find a repository..."
               className="bg-secondary-light placeholder:text-primary-extra-dark/60 w-full rounded-md"
-              onChange={(e) => setRepo(e.target.value)}
+              onChange={(e) => {
+                setRepo(e.target.value);
+                setShownRepos(
+                  repos.filter((r) => r.name.startsWith(e.target.value))
+                );
+              }}
             />
             {same ? (
               <Link
@@ -137,7 +144,7 @@ export default function Profile() {
               </div>
             ) : (
               <div className="divide-secondary flex flex-col divide-y">
-                {repos.map((repo) => (
+                {shownRepos.map((repo) => (
                   <RepoTile repo={repo} key={repo.name} />
                 ))}
                 <div></div>

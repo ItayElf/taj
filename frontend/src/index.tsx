@@ -8,6 +8,7 @@ import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import RepoPage from "./pages/Repo";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -21,6 +22,7 @@ ReactDOM.render(
             element={<Auth signIn={false} key="signUp" />}
           />
           <Route path="/user/:username" element={<Profile />} />
+          <Route path="/repo/:repo" element={<RepoPage />} />
         </Routes>
       </React.StrictMode>
     </BrowserRouter>

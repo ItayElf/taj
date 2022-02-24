@@ -4,3 +4,21 @@ export interface Repo {
   creator: string;
   contributors: string[];
 }
+
+export interface RepoFile {
+  binary: boolean;
+  commit: Commit;
+  content: string;
+  name: string;
+  type: "file" | "directory";
+}
+
+export interface Commit {
+  author: string;
+  file_changes: Array<any>;
+  hash: string;
+  idx: number;
+  last_commit_hash: string | null;
+  message: string;
+  timestamp: number;
+}

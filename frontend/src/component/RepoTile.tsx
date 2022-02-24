@@ -8,7 +8,10 @@ interface Props {
 export default function RepoTile({ repo }: Props) {
   return (
     <div className="my-2 flex flex-col">
-      <Link to="#" className="text-primary text-xl font-bold">
+      <Link
+        to={`/repo/${repo.name}`}
+        className="text-primary text-xl font-bold"
+      >
         {repo.name}
       </Link>
       <p>{repo.description}</p>
