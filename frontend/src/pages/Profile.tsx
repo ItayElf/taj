@@ -103,30 +103,18 @@ export default function Profile() {
           )}
         </div>
         <div className="divide-secondary flex w-full flex-col space-y-4 divide-y">
-          <div className="flex flex-row space-x-4">
-            <input
-              type="text"
-              value={repo}
-              placeholder="Find a repository..."
-              className="bg-secondary-light placeholder:text-primary-extra-dark/60 w-full rounded-md"
-              onChange={(e) => {
-                setRepo(e.target.value);
-                setShownRepos(
-                  repos.filter((r) => r.name.startsWith(e.target.value))
-                );
-              }}
-            />
-            {same ? (
-              <Link
-                to="#"
-                className="bg-primary hover:bg-primary/80 w-32 rounded py-2 px-4 text-center font-bold text-white"
-              >
-                New Repo
-              </Link>
-            ) : (
-              <div></div>
-            )}
-          </div>
+          <input
+            type="text"
+            value={repo}
+            placeholder="Find a repository..."
+            className="bg-secondary-light placeholder:text-primary-extra-dark/60 w-full rounded-md"
+            onChange={(e) => {
+              setRepo(e.target.value);
+              setShownRepos(
+                repos.filter((r) => r.name.startsWith(e.target.value))
+              );
+            }}
+          />
           <div>
             {!repos ? (
               <div className="flex flex-col items-center justify-center space-y-4">
@@ -134,16 +122,6 @@ export default function Profile() {
                   {same ? "You don't" : `${username} doesn't`} have any
                   repositories yet!
                 </h2>
-                {same ? (
-                  <Link
-                    to="#"
-                    className="bg-primary hover:bg-primary/80 w-32 rounded py-2 px-4 text-center font-bold text-white"
-                  >
-                    New Repo
-                  </Link>
-                ) : (
-                  <div></div>
-                )}
               </div>
             ) : (
               <div className="divide-secondary flex flex-col divide-y">

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiUrl } from "../constants";
-import { useAppSelector } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { setToken, setUsername } from "../redux/userData";
 import { post } from "../utils/fetchUtils";
 import Logo from "./Logo";
 
@@ -10,6 +11,7 @@ export default function Header() {
   // const username = getInitial<string>("username");
   // const token = getInitial<string>("token");
   const [logged, setLogged] = useState(false);
+  const dispatch = useAppDispatch();
   useEffect(() => {
     if (!username || !token) {
       return;
@@ -22,6 +24,12 @@ export default function Header() {
       setLogged(JSON.parse(await res.text()));
     })();
   }, [token, username]);
+
+  const logout = () => {
+    dispatch(setUsername(""));
+    dispatch(setToken(""));
+    window.location.reload();
+  };
 
   return (
     <nav className="bg-secondary-dark w-full">
@@ -72,12 +80,12 @@ export default function Header() {
           </div>
           {logged ? (
             <div className="flex flex-shrink-0 space-x-6">
-              <Link
-                to="#"
+              <button
+                onClick={logout}
                 className="bg-primary hover:bg-primary/80 rounded py-2 px-4 text-center font-bold text-white"
               >
-                New Repo
-              </Link>
+                Log Out
+              </button>
               <Link to={`/user/${username}`}>
                 <img
                   src={`/user/${username}/profile_pic`}
