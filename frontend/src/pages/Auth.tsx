@@ -8,6 +8,7 @@ import {
   setUsername as setUsernameAction,
   setToken as setTokenAction,
 } from "../redux/userData";
+import { useTitle } from "../utils/funcs";
 
 interface Props {
   signIn: boolean;
@@ -19,6 +20,8 @@ export default function Auth({ signIn }: Props) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  useTitle("Taj - " + (signIn ? "Sign In" : "Sign Up"));
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -7,13 +7,15 @@ import { apiUrl } from "../constants";
 import { get } from "../utils/fetchUtils";
 import { Commit, Repo, RepoFile } from "../utils/interfaces";
 import { MdFolder, MdInsertDriveFile } from "react-icons/md";
-import { timeSince } from "../utils/funcs";
+import { timeSince, useTitle } from "../utils/funcs";
 
 export default function RepoPage() {
   const [repoData, setRepoData] = useState<Repo | null | undefined>(null);
   const [repoFiles, setRepoFiles] = useState<RepoFile[]>([]);
   const [lastCommit, setLastCommit] = useState<Commit | null>(null);
   const { repo } = useParams();
+
+  useTitle("Taj - " + repo);
 
   useEffect(() => {
     async function checkRepo() {

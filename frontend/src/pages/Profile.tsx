@@ -7,6 +7,7 @@ import RepoTile from "../component/RepoTile";
 import { apiUrl } from "../constants";
 import { useAppSelector } from "../redux/hooks";
 import { get, post } from "../utils/fetchUtils";
+import { useTitle } from "../utils/funcs";
 import { Repo } from "../utils/interfaces";
 
 export default function Profile() {
@@ -19,6 +20,8 @@ export default function Profile() {
   const { username: loggedUser, token } = useAppSelector(
     (state) => state.userData
   );
+
+  useTitle("Taj - " + username);
 
   useEffect(() => {
     async function checkUser() {

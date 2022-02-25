@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export function timeSince(timestamp: number) {
   var seconds = Math.floor((new Date().getTime() - timestamp) / 1000);
 
@@ -23,4 +25,10 @@ export function timeSince(timestamp: number) {
     return Math.floor(interval) + " minutes";
   }
   return Math.floor(seconds) + " seconds";
+}
+
+export function useTitle(title: string) {
+  useEffect(() => {
+    document.title = title;
+  }, []);
 }
