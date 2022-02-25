@@ -9,6 +9,9 @@ import { Provider } from "react-redux";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import RepoPage from "./pages/Repo";
+import Header from "./component/Header";
+import NotFound from "./component/NotFound";
+import Footer from "./component/Footer";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -23,6 +26,17 @@ ReactDOM.render(
           />
           <Route path="/user/:username" element={<Profile />} />
           <Route path="/repo/:repo" element={<RepoPage />} />
+
+          <Route
+            path="*"
+            element={
+              <div>
+                <Header />
+                <NotFound className="h-full-main" />
+                <Footer />
+              </div>
+            }
+          />
         </Routes>
       </React.StrictMode>
     </BrowserRouter>
