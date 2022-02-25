@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import Logo from "../component/Logo";
 import { apiUrl } from "../constants";
-import { useAppDispatch } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { post } from "../utils/fetchUtils";
 import {
   setUsername as setUsernameAction,
@@ -18,10 +18,27 @@ export default function Auth({ signIn }: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [logged, setLogged] = useState(false);
+  const { username: loggedUser, token } = useAppSelector(
+    (state) => state.userData
+  );
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   useTitle("Taj - " + (signIn ? "Sign In" : "Sign Up"));
+
+  useEffect(() => {
+    if (!loggedUser || !token) {
+      return;
+    }
+    (async () => {
+      const res = await post(apiUrl + "auth/validate_token", {
+        username: loggedUser,
+        token,
+      });
+      setLogged(JSON.parse(await res.text()));
+    })();
+  }, []);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,6 +63,10 @@ export default function Auth({ signIn }: Props) {
     }
     navigate(`/user/${username}`);
   };
+
+  if (logged) {
+    return <Navigate to={`/user/${loggedUser}`} />;
+  }
 
   return (
     <div className="flex justify-center p-5">
