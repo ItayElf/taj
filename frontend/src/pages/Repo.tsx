@@ -5,11 +5,14 @@ import Header from "../component/Header";
 import NotFound from "../component/NotFound";
 import { apiUrl } from "../constants";
 import { get } from "../utils/fetchUtils";
-import { Repo, RepoFile } from "../utils/interfaces";
+import { Commit, Repo, RepoFile } from "../utils/interfaces";
+import { MdFolder, MdInsertDriveFile } from "react-icons/md";
+import { timeSince } from "../utils/funcs";
 
 export default function RepoPage() {
   const [repoData, setRepoData] = useState<Repo | null | undefined>(null);
   const [repoFiles, setRepoFiles] = useState<RepoFile[]>([]);
+  const [lastCommit, setLastCommit] = useState<Commit | null>(null);
   const { repo } = useParams();
 
   useEffect(() => {
@@ -24,7 +27,13 @@ export default function RepoPage() {
         return;
       }
       const res2 = await get(apiUrl + `repos/${repo}/files`, {});
-      setRepoFiles(JSON.parse(await res2.text()) as RepoFile[]);
+      const files = JSON.parse(await res2.text()) as RepoFile[];
+      setRepoFiles(files);
+      setLastCommit(
+        files.reduce((p, c) =>
+          p.commit.timestamp > c.commit.timestamp ? p : c
+        ).commit
+      );
     }
     checkRepo();
   }, [repo]);
@@ -65,7 +74,79 @@ export default function RepoPage() {
               {repo}
             </Link>
           </div>
-          <div className="w-full"></div>
+          <div className="flex w-full flex-col px-5">
+            <div className="flex justify-between">
+              <button className="bg-secondary hover:bg-secondary/80 text-primary-dark block rounded py-2 px-4 text-center font-bold">
+                COMMITNAME
+              </button>
+              {/* // TODO: add dropdown with commits */}
+              <button className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white">
+                Code
+              </button>
+              {/* // TODO: add dropdown with download options */}
+            </div>
+            <div className="border-secondary mt-5 flex flex-col rounded border">
+              <div className="bg-secondary flex flex-row justify-between px-4 py-2">
+                <div className="flex flex-row items-center space-x-5">
+                  <Link to={`/user/${lastCommit?.author}`}>
+                    <img
+                      src={`/user/${lastCommit?.author}/profile_pic`}
+                      className="h-8 w-8 max-w-none rounded-full"
+                      alt={`${lastCommit?.author}'s profile`}
+                    />
+                  </Link>
+                  <Link
+                    to={`/user/${lastCommit?.author}`}
+                    className="font-bold"
+                  >
+                    {lastCommit?.author}
+                  </Link>
+                  <span>{lastCommit?.message}</span>
+                </div>
+                <span className="w-1/4 text-right">
+                  {timeSince(lastCommit?.timestamp ?? new Date().getTime())} ago
+                </span>
+              </div>
+              <div>
+                {repoFiles
+                  .filter((f) => f.type === "dir")
+                  .map((f) => (
+                    <div className="flex flex-row px-4 py-2">
+                      <MdFolder className="text-primary text-2xl" />
+                      <div className="flex w-full flex-row pl-2">
+                        <Link to={"#"} className="w-1/3">
+                          {f.name}
+                        </Link>
+                        <Link to={"#"} className="text-primary-dark/80 w-full">
+                          {f.commit.message}
+                        </Link>
+                        <span className="w-1/4 text-right">
+                          {timeSince(f.commit.timestamp)} ago
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                {repoFiles
+                  .filter((f) => f.type !== "dir")
+                  .map((f) => (
+                    <div className="flex flex-row px-4 py-2">
+                      <MdInsertDriveFile className="text-primary text-2xl" />
+                      <div className="flex w-full flex-row pl-2">
+                        <Link to={"#"} className="w-1/3">
+                          {f.name}
+                        </Link>
+                        <Link to={"#"} className="text-primary-dark/80 w-full">
+                          {f.commit.message}
+                        </Link>
+                        <span className="w-1/4 text-right">
+                          {timeSince(f.commit.timestamp)} ago
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
           <div className="divide-secondary flex w-1/3 flex-col divide-y-2 pl-4">
             <div className="pb-4">
               <h2 className="text-xl">About</h2>

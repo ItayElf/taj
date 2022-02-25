@@ -10,7 +10,7 @@ export interface RepoFile {
   commit: Commit;
   content: string;
   name: string;
-  type: "file" | "directory";
+  type: "file" | "dir";
 }
 
 export interface Commit {
