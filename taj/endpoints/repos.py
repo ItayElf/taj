@@ -3,7 +3,7 @@ import os
 import sys
 
 from taj.endpoints import app
-from taj.orm.repos import get_all_repos, get_repo, get_repos_of, get_files_of_repo
+from taj.orm.repos import get_all_repos, get_repo, get_repos_of, get_files_of_repo, insert_repo, add_contributor
 
 from flask import jsonify, request
 
@@ -27,10 +27,6 @@ def repos_get_repo(repo):
         except FileNotFoundError as e:
             return str(e), 404
     elif request.method == "POST":
-        try:
-            get_repo(repo)
-        except FileNotFoundError as e:
-            return str(e), 404
         if "username" not in request.json or "token" not in request.json:
             return "Missing username or token in json", 400
         username = request.json.get("username")
@@ -44,6 +40,17 @@ def repos_get_repo(repo):
         dir_path = os.path.join(ROOT_PATH, "dbs", "users", username, repo)
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
+            try:
+                insert_repo(username, repo)
+            except FileNotFoundError as e:
+                return str(e), 404
+        try:
+            if not os.path.isdir(dir_path):
+                os.mkdir(dir_path)
+                insert_repo(username, repo)
+            add_contributor(username, repo)
+        except FileNotFoundError as e:
+            return str(e), 404
         with open(os.path.join(dir_path, "db.db"), "wb+") as f:
             f.write(base64.b64decode(b"".fromhex(request.json["db"])))
         with open(os.path.join(dir_path, "settings.json"), "wb+") as f:

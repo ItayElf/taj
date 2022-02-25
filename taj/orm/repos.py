@@ -5,6 +5,7 @@ from taj.orm.classes import Repo, FileChange
 from taj.orm.commit import get_commit_by_hash
 from taj.orm.connections import main_connection, repo_connection, repo_settings
 from taj.orm.file_change import get_all_changes_prior_to, get_full_file_content, get_last_update_commit
+from taj.orm.users import does_user_exist
 
 _get_repo = """
 SELECT r.name, r.description, u2.username ,GROUP_CONCAT(u.username) 
@@ -104,3 +105,40 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
             files.add(name)
     conn.close()
     return res
+
+
+def is_contributor(username: str, repo: str) -> bool:
+    """Checks whether a user is already a contributor of a repo"""
+    conn = main_connection()
+    c = conn.cursor()
+    c.execute(
+        "SELECT ur.user_id, ur.repo_id FROM users_repos ur JOIN users u on u.id=ur.user_id JOIN repos r ON r.id=ur.repo_id WHERE u.username=? AND r.name=?",
+        (username, repo))
+    tup = c.fetchone()
+    conn.close()
+    return not not tup
+
+
+def add_contributor(username: str, repo: str) -> None:
+    """Adds a user as a contributor for a repo if it's not already"""
+    if is_contributor(username, repo):
+        return
+    get_repo(repo)
+    does_user_exist(username)
+    conn = main_connection()
+    conn.execute(
+        "INSERT INTO users_repos(user_id, repo_id) SELECT u.id, r.id FROM users_repos ur JOIN users u on u.id=ur.user_id JOIN repos r ON r.id=ur.repo_id WHERE u.username=? AND r.name=?",
+        (username, repo))
+    conn.commit()
+    conn.close()
+
+
+def insert_repo(username: str, name: str) -> None:
+    """Inserts a new repo to the database"""
+    if not does_user_exist(username):
+        raise FileNotFoundError("User was not found")
+    conn = main_connection()
+    conn.execute("INSERT INTO repos(creator_id, name, description) SELECT id, ?, ? FROM users WHERE username=?",
+                 (name, "", username))
+    conn.commit()
+    conn.close()
