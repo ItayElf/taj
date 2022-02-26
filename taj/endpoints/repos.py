@@ -3,7 +3,8 @@ import os
 import sys
 
 from taj.endpoints import app
-from taj.orm.repos import get_all_repos, get_repo, get_repos_of, get_files_of_repo, insert_repo, add_contributor
+from taj.orm.repos import get_all_repos, get_repo, get_repos_of, get_files_of_repo, insert_repo, add_contributor, \
+    get_file_content
 
 from flask import jsonify, request
 
@@ -73,5 +74,13 @@ def repos_files(repo):
     try:
         files = get_files_of_repo(repo, directory)
         return jsonify(files)
+    except FileNotFoundError as e:
+        return str(e), 404
+
+
+@app.route("/api/repos/<repo>/file/<path:files>/")
+def repos_get_file(repo, files):
+    try:
+        return jsonify(get_file_content(repo, files))
     except FileNotFoundError as e:
         return str(e), 404

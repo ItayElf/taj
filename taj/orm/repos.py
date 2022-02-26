@@ -144,3 +144,30 @@ def insert_repo(username: str, name: str) -> None:
                  (name, "", username))
     conn.commit()
     conn.close()
+
+
+def get_file_content(repo: str, file: str, commit: str = "") -> Dict[str, Union[str, bool]]:
+    """Returns a dict with file content and metadata"""
+    file = file.replace("/", os.path.sep)
+    file = file.replace("\\", os.path.sep)
+    r = get_repo(repo)
+    conn = repo_connection(r.creator, repo)
+    commit_hash = get_commit_by_hash(conn, commit) if commit else repo_settings(r.creator, repo)["last_commit"]
+    c = get_commit_by_hash(conn, commit_hash)
+    changes = list(filter(lambda x: os.path.normpath(x.name) == file, get_all_changes_prior_to(conn, c.timestamp)))
+    if not changes:
+        raise FileNotFoundError(f"No file named {file} was found in the given commit")
+    content = get_full_file_content(changes)
+    binary = False
+    size = len(content)
+    try:
+        content = content.decode()
+    except UnicodeDecodeError:
+        content = content.hex()
+        binary = True
+    return {
+        "content": content,
+        "binary": binary,
+        "lines": content.count("\n") + 1 if not binary else -1,
+        "size": size,
+    }
