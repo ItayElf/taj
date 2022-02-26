@@ -94,3 +94,15 @@ def repos_serve_image(repo, image):
         return send_file(io.BytesIO(img), mimetype="image/jpg")
     except FileNotFoundError as e:
         return str(e), 404
+
+
+@app.route("/api/repos/<repo>/download/<path:file>")
+def repos_download_file(repo, file):
+    try:
+        metadata = get_file_content(repo, file)
+        content = metadata["content"]
+        content = b"".fromhex(content) if metadata["binary"] else content.encode()
+        name = os.path.normpath(file).split(os.path.sep)[-1]
+        return send_file(io.BytesIO(content), as_attachment=True, attachment_filename=name)
+    except FileNotFoundError as e:
+        return str(e), 404

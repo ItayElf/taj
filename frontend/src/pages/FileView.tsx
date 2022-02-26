@@ -6,9 +6,10 @@ import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";
 import { apiUrl } from "../constants";
-import { get } from "../utils/fetchUtils";
+import { get, post } from "../utils/fetchUtils";
 import { getBytesSize, useQuery } from "../utils/funcs";
 import { FileMetadata } from "../utils/interfaces";
+import JsFileDownloader from "js-file-downloader";
 
 export function FileView() {
   const [fileData, setFileData] = useState<FileMetadata | null | undefined>(
@@ -37,6 +38,12 @@ export function FileView() {
     }
     getFile();
   }, [file, repo]);
+
+  async function download() {
+    // const res = await get(apiUrl + `repos/${repo}/file/${file}`, {});
+    // const blob = await res.blob();
+    new JsFileDownloader({ url: apiUrl + `repos/${repo}/download/${file}` });
+  }
 
   if (fileData === null) {
     return (
@@ -90,7 +97,10 @@ export function FileView() {
               ))}
               <span>{last}</span>
             </div>
-            <button className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white">
+            <button
+              onClick={download}
+              className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white"
+            >
               Download
             </button>
             {/* TODO: download */}
@@ -114,7 +124,7 @@ export function FileView() {
               </SyntaxHighlighter>
             ) : imgs.indexOf(ext) !== -1 ? (
               <div className="flex w-full justify-center p-4">
-                <img src={apiUrl + `repos/${repo}/image/${file}`} />
+                <img src={apiUrl + `repos/${repo}/image/${file}`} alt="" />
               </div>
             ) : (
               <div></div>
