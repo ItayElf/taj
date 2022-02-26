@@ -18,11 +18,12 @@ export function FileView() {
   const map = require("lang-map");
   const query = useQuery();
   const file = query.get("file") ?? "";
-  const ext = file.split(".").pop();
+  const ext = file.split(".").pop() ?? "";
   let dirArr = file.split("/");
   dirArr = [repo ?? "", ...dirArr];
   const last = dirArr[dirArr.length - 1];
   dirArr.pop();
+  const imgs = ["png", "jpg", "jpeg", "bmp"];
 
   useEffect(() => {
     async function getFile() {
@@ -111,8 +112,12 @@ export function FileView() {
               >
                 {fileData.content}
               </SyntaxHighlighter>
+            ) : imgs.indexOf(ext) !== -1 ? (
+              <div className="flex w-full justify-center p-4">
+                <img src={apiUrl + `repos/${repo}/image/${file}`} />
+              </div>
             ) : (
-              <div className="py-4 text-center text-xl">Binary File</div>
+              <div></div>
             )}
           </div>
         </div>
