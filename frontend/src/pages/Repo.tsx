@@ -95,7 +95,7 @@ export default function RepoPage() {
                 COMMITNAME
               </button>
               {/* // TODO: add dropdown with commits */}
-              <div className="flex">
+              <div className="flex text-3xl">
                 {dirArr.map((d, i) => (
                   <div key={i}>
                     <Link
@@ -139,7 +139,10 @@ export default function RepoPage() {
                   <span>{lastCommit?.message}</span>
                 </div>
                 <span className="w-1/4 text-right">
-                  {timeSince(lastCommit?.timestamp ?? new Date().getTime())} ago
+                  {timeSince(
+                    lastCommit?.timestamp ?? new Date().getTime() * 0.001
+                  )}{" "}
+                  ago
                 </span>
               </div>
               <div>
@@ -170,7 +173,10 @@ export default function RepoPage() {
                     <div className="flex flex-row px-4 py-2" key={f.name}>
                       <MdInsertDriveFile className="text-primary text-2xl" />
                       <div className="flex w-full flex-row pl-2">
-                        <Link to={"#"} className="w-1/3">
+                        <Link
+                          to={`/repo/${repo}/file?file=${directory + f.name}`}
+                          className="w-1/3"
+                        >
                           {f.name}
                         </Link>
                         <Link to={"#"} className="text-primary-dark/80 w-full">

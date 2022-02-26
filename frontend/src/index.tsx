@@ -12,6 +12,7 @@ import RepoPage from "./pages/Repo";
 import Header from "./component/Header";
 import NotFound from "./component/NotFound";
 import Footer from "./component/Footer";
+import { FileView } from "./pages/FileView";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -26,7 +27,7 @@ ReactDOM.render(
           />
           <Route path="/user/:username" element={<Profile />} />
           <Route path="/repo/:repo" element={<RepoPage />} />
-
+          <Route path="/repo/:repo/file" element={<FileView />} />
           <Route
             path="*"
             element={

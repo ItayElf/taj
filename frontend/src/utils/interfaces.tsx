@@ -22,3 +22,12 @@ export interface Commit {
   message: string;
   timestamp: number;
 }
+
+export interface FileMetadata {
+  binary: boolean;
+  content: string;
+  lines: number;
+  size: number;
+}
+
+export interface LanguageDict {}

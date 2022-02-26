@@ -2,9 +2,9 @@ import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 export function timeSince(timestamp: number) {
-  var seconds = Math.floor((new Date().getTime() - timestamp) / 1000);
+  const seconds = new Date().getTime() * 0.001 - timestamp;
 
-  var interval = seconds / 31536000;
+  let interval = seconds / 31536000;
 
   if (interval > 1) {
     return Math.floor(interval) + " years";
@@ -26,6 +26,22 @@ export function timeSince(timestamp: number) {
     return Math.floor(interval) + " minutes";
   }
   return Math.floor(seconds) + " seconds";
+}
+
+export function getBytesSize(size: number) {
+  let interval = size / 1e9;
+  if (interval >= 1) {
+    return Math.round(interval * 100) / 100 + " GB";
+  }
+  interval = size / 1e6;
+  if (interval >= 1) {
+    return Math.round(interval * 100) / 100 + " MB";
+  }
+  interval = size / 1000;
+  if (interval >= 1) {
+    return Math.round(interval * 100) / 100 + " KB";
+  }
+  return size + " bytes";
 }
 
 export function useTitle(title: string) {
