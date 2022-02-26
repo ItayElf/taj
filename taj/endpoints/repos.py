@@ -36,21 +36,24 @@ def repos_get_repo(repo):
         if not validate_token(username, token):
             return "Token is incorrect or expired", 403
         if "db" not in request.json or "settings" not in request.json:
-            return "Missing db file or settings json", 400
+            return "Missing db file or settings in json", 400
+        if "new" not in request.json:
+            return "Missing new in json", 400
+        new = request.json.get("new")
+        if not request.json["db"] or not request.json["settings"]:
+            return "Invalid files (db or settings)", 400
         dir_path = os.path.join(ROOT_PATH, "dbs", "users", username, repo)
+        # try:
         if not os.path.isdir(dir_path):
+            if not new:
+                return f"No repository with name {repo} was found.", 404
             os.mkdir(dir_path)
-            try:
-                insert_repo(username, repo)
-            except FileNotFoundError as e:
-                return str(e), 404
-        try:
-            if not os.path.isdir(dir_path):
-                os.mkdir(dir_path)
-                insert_repo(username, repo)
-            add_contributor(username, repo)
-        except FileNotFoundError as e:
-            return str(e), 404
+            insert_repo(username, repo)
+        elif new:
+            return f"Repository with name {repo} already exists.", 406
+        add_contributor(username, repo)
+        # except FileNotFoundError as e:
+        #     return str(e), 404
         with open(os.path.join(dir_path, "db.db"), "wb+") as f:
             f.write(base64.b64decode(b"".fromhex(request.json["db"])))
         with open(os.path.join(dir_path, "settings.json"), "wb+") as f:

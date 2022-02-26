@@ -10,8 +10,8 @@ from taj.orm.users import does_user_exist
 _get_repo = """
 SELECT r.name, r.description, u2.username ,GROUP_CONCAT(u.username) 
 FROM repos r 
-JOIN users_repos ur ON ur.repo_id = r.id
-JOIN users u ON ur.user_id = u.id
+LEFT JOIN users_repos ur ON ur.repo_id = r.id
+LEFT JOIN users u ON ur.user_id = u.id
 JOIN users u2 ON u2.id = r.creator_id 
 WHERE r.name=?
 GROUP BY r.name;
@@ -36,7 +36,7 @@ def get_repo(name: str) -> Repo:
     conn.close()
     if not tup:
         raise FileNotFoundError(f"No repo named {name}")
-    return Repo(tup[0], tup[1], tup[2], tup[3].split(","))
+    return Repo(tup[0], tup[1], tup[2], tup[3].split(",") if tup[3] else [])
 
 
 def get_all_repos() -> List[Repo]:
@@ -126,9 +126,11 @@ def add_contributor(username: str, repo: str) -> None:
     get_repo(repo)
     does_user_exist(username)
     conn = main_connection()
+    uid = conn.execute("SELECT id FROM users WHERE username=?", (username,)).fetchone()[0]
+    repoid = conn.execute("SELECT id FROM repos WHERE name=?", (repo,)).fetchone()[0]
     conn.execute(
-        "INSERT INTO users_repos(user_id, repo_id) SELECT u.id, r.id FROM users_repos ur JOIN users u on u.id=ur.user_id JOIN repos r ON r.id=ur.repo_id WHERE u.username=? AND r.name=?",
-        (username, repo))
+        "INSERT INTO users_repos(user_id, repo_id) VALUES(?, ?)",
+        (uid, repoid))
     conn.commit()
     conn.close()
 
