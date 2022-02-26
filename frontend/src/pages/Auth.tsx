@@ -38,7 +38,7 @@ export default function Auth({ signIn }: Props) {
       });
       setLogged(JSON.parse(await res.text()));
     })();
-  }, []);
+  }, [token, loggedUser]);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

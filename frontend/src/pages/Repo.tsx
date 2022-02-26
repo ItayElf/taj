@@ -7,13 +7,20 @@ import { apiUrl } from "../constants";
 import { get } from "../utils/fetchUtils";
 import { Commit, Repo, RepoFile } from "../utils/interfaces";
 import { MdFolder, MdInsertDriveFile } from "react-icons/md";
-import { timeSince, useTitle } from "../utils/funcs";
+import { timeSince, useQuery, useTitle } from "../utils/funcs";
 
 export default function RepoPage() {
   const [repoData, setRepoData] = useState<Repo | null | undefined>(null);
   const [repoFiles, setRepoFiles] = useState<RepoFile[]>([]);
   const [lastCommit, setLastCommit] = useState<Commit | null>(null);
   const { repo } = useParams();
+  const query = useQuery();
+  const directory = query.get("dir") ?? "";
+  let dirArr = directory.split("/");
+  dirArr.pop();
+  dirArr = [repo ?? "", ...dirArr];
+  const last = dirArr[dirArr.length - 1];
+  dirArr.pop();
 
   useTitle("Taj - " + repo);
 
@@ -28,17 +35,23 @@ export default function RepoPage() {
         setRepoData(undefined);
         return;
       }
-      const res2 = await get(apiUrl + `repos/${repo}/files`, {});
+      const res2 = await get(apiUrl + `repos/${repo}/files`, { directory });
       const files = JSON.parse(await res2.text()) as RepoFile[];
+      if (files.length === 0) {
+        setRepoData(undefined);
+        return;
+      }
       setRepoFiles(files);
       setLastCommit(
-        files.reduce((p, c) =>
-          p.commit.timestamp > c.commit.timestamp ? p : c
-        ).commit
+        !!files
+          ? files.reduce((p, c) =>
+              p.commit.timestamp > c.commit.timestamp ? p : c
+            ).commit
+          : null
       );
     }
     checkRepo();
-  }, [repo]);
+  }, [repo, directory]);
 
   if (repoData === null) {
     return (
@@ -82,6 +95,26 @@ export default function RepoPage() {
                 COMMITNAME
               </button>
               {/* // TODO: add dropdown with commits */}
+              <div className="flex">
+                {dirArr.map((d, i) => (
+                  <div key={i}>
+                    <Link
+                      to={
+                        i === 0
+                          ? `/repo/${repo}`
+                          : `/repo/${repo}?dir=${
+                              dirArr.slice(1, i + 1).join("/") + "/"
+                            }`
+                      }
+                      className="text-primary"
+                    >
+                      {d}
+                    </Link>
+                    <span>/</span>
+                  </div>
+                ))}
+                <span>{last}</span>
+              </div>
               <button className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white">
                 Code
               </button>
@@ -113,10 +146,13 @@ export default function RepoPage() {
                 {repoFiles
                   .filter((f) => f.type === "dir")
                   .map((f) => (
-                    <div className="flex flex-row px-4 py-2">
+                    <div className="flex flex-row px-4 py-2" key={f.name}>
                       <MdFolder className="text-primary text-2xl" />
                       <div className="flex w-full flex-row pl-2">
-                        <Link to={"#"} className="w-1/3">
+                        <Link
+                          to={`/repo/${repo}/?dir=${directory + f.name + "/"}`}
+                          className="w-1/3"
+                        >
                           {f.name}
                         </Link>
                         <Link to={"#"} className="text-primary-dark/80 w-full">
@@ -131,7 +167,7 @@ export default function RepoPage() {
                 {repoFiles
                   .filter((f) => f.type !== "dir")
                   .map((f) => (
-                    <div className="flex flex-row px-4 py-2">
+                    <div className="flex flex-row px-4 py-2" key={f.name}>
                       <MdInsertDriveFile className="text-primary text-2xl" />
                       <div className="flex w-full flex-row pl-2">
                         <Link to={"#"} className="w-1/3">
@@ -163,7 +199,7 @@ export default function RepoPage() {
               </h2>
               <div className="flex flex-row flex-wrap space-x-3">
                 {repoData.contributors.map((c) => (
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center" key={c}>
                     <img
                       src={`/user/${c}/profile_pic`}
                       className="border-primary h-10 w-10 max-w-none rounded-full border-2"

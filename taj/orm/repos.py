@@ -127,10 +127,10 @@ def add_contributor(username: str, repo: str) -> None:
     does_user_exist(username)
     conn = main_connection()
     uid = conn.execute("SELECT id FROM users WHERE username=?", (username,)).fetchone()[0]
-    repoid = conn.execute("SELECT id FROM repos WHERE name=?", (repo,)).fetchone()[0]
+    repo_id = conn.execute("SELECT id FROM repos WHERE name=?", (repo,)).fetchone()[0]
     conn.execute(
         "INSERT INTO users_repos(user_id, repo_id) VALUES(?, ?)",
-        (uid, repoid))
+        (uid, repo_id))
     conn.commit()
     conn.close()
 

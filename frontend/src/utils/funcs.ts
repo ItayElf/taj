@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 
 export function timeSince(timestamp: number) {
   var seconds = Math.floor((new Date().getTime() - timestamp) / 1000);
@@ -30,5 +31,10 @@ export function timeSince(timestamp: number) {
 export function useTitle(title: string) {
   useEffect(() => {
     document.title = title;
-  }, []);
+  }, [title]);
+}
+
+export function useQuery() {
+  const { search } = useLocation();
+  return useMemo(() => new URLSearchParams(search), [search]);
 }
