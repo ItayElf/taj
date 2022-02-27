@@ -6,17 +6,17 @@ import NotFound from "../component/NotFound";
 import RepoTile from "../component/RepoTile";
 import { apiUrl } from "../constants";
 import { useAppSelector } from "../redux/hooks";
-import { get, post } from "../utils/fetchUtils";
-import { useTitle } from "../utils/funcs";
+import { get } from "../utils/fetchUtils";
+import { useSame, useTitle } from "../utils/funcs";
 import { Repo } from "../utils/interfaces";
 
 export default function Profile() {
   const [found, setFound] = useState<boolean | null>(null);
-  const [same, setSame] = useState(false);
   const [repo, setRepo] = useState("");
   const [repos, setRepos] = useState<Repo[]>([]);
   const [shownRepos, setShownRepos] = useState<Repo[]>([]);
   const { username } = useParams();
+  const { same } = useSame(username ?? "");
   const { username: loggedUser, token } = useAppSelector(
     (state) => state.userData
   );
@@ -33,14 +33,6 @@ export default function Profile() {
       } catch (e) {
         setFound(false);
         return;
-      }
-      if (loggedUser === username) {
-        const res = await post(apiUrl + "auth/validate_token", {
-          username,
-          token,
-        });
-        const text = await res.text();
-        setSame(JSON.parse(text));
       }
     }
     checkUser();

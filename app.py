@@ -1,5 +1,4 @@
-import io
-from flask import send_from_directory, send_file
+from flask import send_from_directory
 from taj.endpoints import *
 from taj.orm import init_db
 from taj.orm.users import get_profile_pic

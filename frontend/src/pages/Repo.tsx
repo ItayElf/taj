@@ -4,16 +4,28 @@ import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";
 import { apiUrl } from "../constants";
-import { get } from "../utils/fetchUtils";
+import { get, post } from "../utils/fetchUtils";
 import { Commit, Repo, RepoFile } from "../utils/interfaces";
-import { MdFolder, MdInsertDriveFile } from "react-icons/md";
-import { timeSince, useQuery, useTitle } from "../utils/funcs";
+import {
+  MdAdd,
+  MdClear,
+  MdDone,
+  MdFolder,
+  MdInsertDriveFile,
+  MdModeEdit,
+} from "react-icons/md";
+import { timeSince, useQuery, useSame, useTitle } from "../utils/funcs";
+import { useAppSelector } from "../redux/hooks";
 
 export default function RepoPage() {
   const [repoData, setRepoData] = useState<Repo | null | undefined>(null);
   const [repoFiles, setRepoFiles] = useState<RepoFile[]>([]);
   const [lastCommit, setLastCommit] = useState<Commit | null>(null);
+  const [editDesc, setEditDesc] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const { same } = useSame(repoData?.creator ?? "");
   const { repo } = useParams();
+  const { username, token } = useAppSelector((state) => state.userData);
   const query = useQuery();
   const directory = query.get("dir") ?? "";
   let dirArr = directory.split("/");
@@ -52,6 +64,58 @@ export default function RepoPage() {
     }
     checkRepo();
   }, [repo, directory]);
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const res = await post(apiUrl + `repos/${repo}/edit`, {
+      username,
+      token,
+      description: editDesc,
+    });
+    if (res.ok) {
+      setEditDesc(null);
+      setRepoData(JSON.parse(await res.text()));
+      setError("");
+    } else {
+      setError(await res.text());
+    }
+  };
+
+  const addContributor = async () => {
+    const user = prompt("Add user as contributor:");
+    if (user === null || user === "") {
+      return;
+    }
+    const res = await post(apiUrl + `repos/${repo}/edit`, {
+      username,
+      token,
+      contributors: [...(repoData?.contributors ?? []), user],
+    });
+    if (res.ok) {
+      setRepoData(JSON.parse(await res.text()));
+    } else {
+      alert(await res.text());
+    }
+  };
+
+  const removeContributor = async (c: string) => {
+    const ans = window.confirm(
+      `Are you sure you want to remove ${c} as a contributor from this repo?`
+    );
+    if (!ans || repoData === undefined || repoData === null) {
+      return;
+    }
+    const res = await post(apiUrl + `repos/${repo}/edit`, {
+      username,
+      token,
+      contributors: repoData.contributors.filter((con) => con !== c),
+    });
+    if (res.ok) {
+      setRepoData(JSON.parse(await res.text()));
+    } else {
+      alert(await res.text());
+    }
+  };
 
   if (repoData === null) {
     return (
@@ -149,9 +213,12 @@ export default function RepoPage() {
                 {repoFiles
                   .filter((f) => f.type === "dir")
                   .map((f) => (
-                    <div className="flex flex-row px-4 py-2" key={f.name}>
-                      <MdFolder className="text-primary text-2xl" />
-                      <div className="flex w-full flex-row pl-2">
+                    <div
+                      className="flex flex-row items-center px-4 py-2"
+                      key={f.name}
+                    >
+                      <MdFolder className="text-primary text-4xl" />
+                      <div className="flex w-full flex-row items-center pl-2 text-xl">
                         <Link
                           to={`/repo/${repo}/?dir=${directory + f.name + "/"}`}
                           className="w-1/3"
@@ -170,9 +237,12 @@ export default function RepoPage() {
                 {repoFiles
                   .filter((f) => f.type !== "dir")
                   .map((f) => (
-                    <div className="flex flex-row px-4 py-2" key={f.name}>
-                      <MdInsertDriveFile className="text-primary text-2xl" />
-                      <div className="flex w-full flex-row pl-2">
+                    <div
+                      className="flex flex-row items-center px-4 py-2"
+                      key={f.name}
+                    >
+                      <MdInsertDriveFile className="text-primary text-4xl" />
+                      <div className="flex w-full flex-row items-center pl-2 text-xl">
                         <Link
                           to={`/repo/${repo}/file?file=${directory + f.name}`}
                           className="w-1/3"
@@ -194,24 +264,68 @@ export default function RepoPage() {
           <div className="divide-secondary flex w-1/3 flex-col divide-y-2 pl-4">
             <div className="pb-4">
               <h2 className="text-xl">About</h2>
-              <p>{repoData.description}</p>
+              <div className="flex justify-between">
+                {editDesc === null ? (
+                  <p>{repoData.description}</p>
+                ) : (
+                  <div className="w-full">
+                    <form className="flex w-full" onSubmit={submit}>
+                      <textarea
+                        // type="text"
+                        value={editDesc}
+                        onChange={(e) => setEditDesc(e.target.value)}
+                        className="bg-secondary-light mr-2 w-full rounded"
+                      />
+                      <button>
+                        <MdDone className="text-primary mr-4 text-xl" />
+                      </button>
+                    </form>
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+                  </div>
+                )}
+                {same && editDesc === null && (
+                  <button
+                    onClick={() => {
+                      setEditDesc(repoData.description);
+                    }}
+                  >
+                    <MdModeEdit className="text-primary mr-4 text-xl" />
+                  </button>
+                )}
+              </div>
             </div>
             <div className="pt-4">
-              <h2 className="text-xl">
-                Contributors
-                <span className="bg-secondary ml-1 rounded-full p-1">
-                  {repoData.contributors.length}
-                </span>
-              </h2>
+              <div className="flex justify-between">
+                <h2 className="text-xl">
+                  Contributors
+                  <span className="bg-secondary ml-1 rounded-full p-1">
+                    {repoData.contributors.length}
+                  </span>
+                </h2>
+                {same && (
+                  <button onClick={addContributor}>
+                    <MdAdd className="text-primary mr-4 text-2xl" />
+                  </button>
+                )}
+              </div>
               <div className="flex flex-row flex-wrap space-x-3">
                 {repoData.contributors.map((c) => (
-                  <div className="flex flex-col items-center" key={c}>
-                    <img
-                      src={`/user/${c}/profile_pic`}
-                      className="border-primary h-10 w-10 max-w-none rounded-full border-2"
-                      alt={`${c}'s profile`}
-                    />
-                    <span>{c}</span>
+                  <div className="flex flex-col items-center">
+                    <Link to={`/user/${c}`} key={c}>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src={`/user/${c}/profile_pic`}
+                          className="border-primary h-10 w-10 max-w-none rounded-full border-2"
+                          alt={`${c}'s profile`}
+                        />
+                        <span>{c}</span>
+                      </div>
+                    </Link>
+                    {c !== repoData.creator && (
+                      <button onClick={() => removeContributor(c)}>
+                        <MdClear className="top-0 text-red-500" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

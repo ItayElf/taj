@@ -171,3 +171,28 @@ def get_file_content(repo: str, file: str, commit: str = "") -> Dict[str, Union[
         "lines": content.count("\n") + 1 if not binary else -1,
         "size": size,
     }
+
+
+def reset_contributors(repo: str):
+    """Removes all contributors for a repo except its creator"""
+    r = get_repo(repo)
+    conn = main_connection()
+    conn.execute(
+        "DELETE FROM users_repos WHERE user_id != (SELECT id FROM users WHERE username=? ) AND repo_id=(SELECT id FROM repos WHERE name=?)",
+        (r.creator, repo))
+    conn.commit()
+    conn.close()
+
+
+def update_repo(r: Repo):
+    """Updates a repo in the db according to the given object, assuming a repo with this name already exists"""
+    conn = main_connection()
+    conn.execute("UPDATE repos SET description=? WHERE name=?", (r.description, r.name))
+    conn.commit()
+    reset_contributors(r.name)
+    for c in r.contributors:
+        if does_user_exist(c):
+            add_contributor(c, r.name)
+        else:
+            raise FileNotFoundError(f"No user named {c}")
+    conn.close()

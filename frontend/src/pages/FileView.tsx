@@ -6,8 +6,8 @@ import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";
 import { apiUrl } from "../constants";
-import { get, post } from "../utils/fetchUtils";
-import { getBytesSize, useQuery } from "../utils/funcs";
+import { get } from "../utils/fetchUtils";
+import { getBytesSize, useQuery, useTitle } from "../utils/funcs";
 import { FileMetadata } from "../utils/interfaces";
 import JsFileDownloader from "js-file-downloader";
 
@@ -25,6 +25,8 @@ export function FileView() {
   const last = dirArr[dirArr.length - 1];
   dirArr.pop();
   const imgs = ["png", "jpg", "jpeg", "bmp"];
+
+  useTitle("Taj - " + repo);
 
   useEffect(() => {
     async function getFile() {
@@ -127,7 +129,7 @@ export function FileView() {
                 <img src={apiUrl + `repos/${repo}/image/${file}`} alt="" />
               </div>
             ) : (
-              <div></div>
+              <div className="p-4 text-center text-3xl">Binary File</div>
             )}
           </div>
         </div>

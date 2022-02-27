@@ -5,7 +5,7 @@ import sys
 
 from taj.endpoints import app
 from taj.orm.repos import get_all_repos, get_repo, get_repos_of, get_files_of_repo, insert_repo, add_contributor, \
-    get_file_content
+    get_file_content, update_repo
 
 from flask import jsonify, request, send_file
 
@@ -53,6 +53,8 @@ def repos_get_repo(repo):
             insert_repo(username, repo)
         elif new:
             return f"Repository with name {repo} already exists.", 406
+        elif username not in get_repo(repo).contributors:
+            return "You are not a contributor of this repo", 403
         add_contributor(username, repo)
         # except FileNotFoundError as e:
         #     return str(e), 404
@@ -106,3 +108,32 @@ def repos_download_file(repo, file):
         return send_file(io.BytesIO(content), as_attachment=True, attachment_filename=name)
     except FileNotFoundError as e:
         return str(e), 404
+
+
+@app.route("/api/repos/<repo>/edit", methods=["POST"])
+def repos_edit_repo(repo):
+    if "username" not in request.json or "token" not in request.json:
+        return "Missing username or token in json", 400
+    username = request.json.get("username")
+    token = request.json.get("token")
+    if not does_user_exist(username):
+        return f"User {username} was not found", 404
+    if not validate_token(username, token):
+        return "Token is incorrect or expired", 403
+    try:
+        r = get_repo(repo)
+    except FileNotFoundError as e:
+        return str(e), 404
+    if username not in r.contributors:
+        return "Cannot edit repository you are not a contributor of", 403
+    description = request.json.get("description")
+    contributors = request.json.get("contributors")
+    if description:
+        r.description = description
+    if contributors and type(contributors) is list:
+        r.contributors = contributors
+    try:
+        update_repo(r)
+    except FileNotFoundError as e:
+        return str(e), 404
+    return jsonify(r)
