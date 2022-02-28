@@ -47,6 +47,18 @@ export function getBytesSize(size: number) {
   return size + " bytes";
 }
 
+export const blobToBase64: (
+  blob: Blob
+) => Promise<string | ArrayBuffer | null> = (blob: Blob) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise((resolve) => {
+    reader.onloadend = () => {
+      resolve(reader.result);
+    };
+  });
+};
+
 export function useTitle(title: string) {
   useEffect(() => {
     document.title = title;
@@ -74,6 +86,8 @@ export function useSame(username: string) {
         if (res.ok) {
           setSame(JSON.parse(text));
         }
+      } else {
+        setSame(false);
       }
     }
     checkSame();

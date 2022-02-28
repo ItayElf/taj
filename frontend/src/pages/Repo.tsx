@@ -266,7 +266,9 @@ export default function RepoPage() {
               <h2 className="text-xl">About</h2>
               <div className="flex justify-between">
                 {editDesc === null ? (
-                  <p>{repoData.description}</p>
+                  <p className="overflow-hidden text-ellipsis">
+                    {repoData.description}
+                  </p>
                 ) : (
                   <div className="w-full">
                     <form className="flex w-full" onSubmit={submit}>

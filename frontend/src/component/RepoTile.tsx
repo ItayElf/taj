@@ -14,9 +14,15 @@ export default function RepoTile({ repo }: Props) {
       >
         {repo.name}
       </Link>
-      <p>{repo.description}</p>
+      <p className="overflow-hidden text-ellipsis whitespace-nowrap">
+        {repo.description}
+      </p>
       <p className="mt-2 font-light ">
-        Created by {repo.creator}, {repo.contributors.length} contributors.
+        Created by{" "}
+        <Link to={`/user/${repo.creator}`} className="text-primary underline">
+          {repo.creator}
+        </Link>
+        , {repo.contributors.length} contributors.
       </p>
     </div>
   );

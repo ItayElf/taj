@@ -67,6 +67,15 @@ def get_profile_pic(name: str = "", idx: int = -1) -> bytes:
     return open(_blank_profile_path, "rb").read()
 
 
+def set_profile_pic(name: str, image: bytes) -> None:
+    """Sets the user's profile picture to a new one"""
+    image = zlib.compress(image)
+    conn = main_connection()
+    conn.execute("UPDATE users SET profile_pic=? WHERE username=?", (image, name))
+    conn.commit()
+    conn.close()
+
+
 def does_user_exist(name: str) -> bool:
     """Returns whether a user with the given username exists"""
     conn = main_connection()
