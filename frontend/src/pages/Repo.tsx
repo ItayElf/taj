@@ -49,7 +49,11 @@ export default function RepoPage() {
         setRepoData(undefined);
         return;
       }
-      const res2 = await get(apiUrl + `repos/${repo}/files`, { directory });
+      console.log({ commit });
+      const res2 = await get(apiUrl + `repos/${repo}/files`, {
+        directory,
+        commit,
+      });
       const files = JSON.parse(await res2.text()) as RepoFile[];
       if (files.length === 0) {
         setRepoData(undefined);
@@ -65,7 +69,7 @@ export default function RepoPage() {
       );
     }
     checkRepo();
-  }, [repo, directory]);
+  }, [repo, directory, commit]);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -173,10 +177,10 @@ export default function RepoPage() {
                     <Link
                       to={
                         i === 0
-                          ? `/repo/${repo}`
+                          ? `/repo/${repo}?commit=${commit}`
                           : `/repo/${repo}?dir=${
                               dirArr.slice(1, i + 1).join("/") + "/"
-                            }`
+                            }&commit=${commit}`
                       }
                       className="text-primary"
                     >
@@ -230,14 +234,19 @@ export default function RepoPage() {
                       <MdFolder className="text-primary text-4xl" />
                       <div className="flex w-full flex-row items-center pl-2 text-xl">
                         <Link
-                          to={`/repo/${repo}/?dir=${directory + f.name + "/"}`}
+                          to={`/repo/${repo}/?dir=${
+                            directory + f.name + "/"
+                          }&commit=${commit}`}
                           className="w-1/3"
                         >
                           {f.name}
                         </Link>
-                        <Link to={"#"} className="text-primary-dark/80 w-full">
+                        {/* <Link to={"#"} className="text-primary-dark/80 w-full">
                           {f.commit.message}
-                        </Link>
+                        </Link> */}
+                        <span className="text-primary-dark/80 w-full">
+                          {f.commit.message}
+                        </span>
                         <span className="w-1/4 text-right">
                           {timeSince(f.commit.timestamp)} ago
                         </span>
@@ -245,7 +254,7 @@ export default function RepoPage() {
                     </div>
                   ))}
                 {repoFiles
-                  .filter((f) => f.type !== "dir")
+                  .filter((f) => f.type === "file")
                   .map((f) => (
                     <div
                       className="flex flex-row items-center px-4 py-2"
@@ -254,14 +263,19 @@ export default function RepoPage() {
                       <MdInsertDriveFile className="text-primary text-4xl" />
                       <div className="flex w-full flex-row items-center pl-2 text-xl">
                         <Link
-                          to={`/repo/${repo}/file?file=${directory + f.name}`}
+                          to={`/repo/${repo}/file?file=${
+                            directory + f.name
+                          }&commit=${commit}`}
                           className="w-1/3"
                         >
                           {f.name}
                         </Link>
-                        <Link to={"#"} className="text-primary-dark/80 w-full">
+                        {/* <Link to={"#"} className="text-primary-dark/80 w-full">
                           {f.commit.message}
-                        </Link>
+                        </Link> */}
+                        <span className="text-primary-dark/80 w-full">
+                          {f.commit.message}
+                        </span>
                         <span className="w-1/4 text-right">
                           {timeSince(f.commit.timestamp)} ago
                         </span>

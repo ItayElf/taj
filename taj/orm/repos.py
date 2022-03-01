@@ -170,7 +170,7 @@ def get_file_content(repo: str, file: str, commit: str = "") -> Dict[str, Union[
     file = file.replace("\\", os.path.sep)
     r = get_repo(repo)
     conn = repo_connection(r.creator, repo)
-    commit_hash = get_commit_by_hash(conn, commit) if commit else repo_settings(r.creator, repo)["last_commit"]
+    commit_hash = commit if commit else repo_settings(r.creator, repo)["last_commit"]
     c = get_commit_by_hash(conn, commit_hash)
     changes = list(filter(lambda x: os.path.normpath(x.name) == file, get_all_changes_prior_to(conn, c.timestamp)))
     if not changes:

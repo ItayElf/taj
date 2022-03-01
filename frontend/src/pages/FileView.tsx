@@ -19,6 +19,7 @@ export function FileView() {
   const map = require("lang-map");
   const query = useQuery();
   const file = query.get("file") ?? "";
+  const commit = query.get("commit") ?? "";
   const ext = file.split(".").pop() ?? "";
   let dirArr = file.split("/");
   dirArr = [repo ?? "", ...dirArr];
@@ -30,7 +31,7 @@ export function FileView() {
 
   useEffect(() => {
     async function getFile() {
-      const res = await get(apiUrl + `repos/${repo}/file/${file}`, {});
+      const res = await get(apiUrl + `repos/${repo}/file/${file}`, { commit });
       try {
         setFileData(JSON.parse(await res.text()) as FileMetadata);
       } catch (e) {
@@ -85,10 +86,10 @@ export function FileView() {
                   <Link
                     to={
                       i === 0
-                        ? `/repo/${repo}`
+                        ? `/repo/${repo}?commit=${commit}`
                         : `/repo/${repo}?dir=${
                             dirArr.slice(1, i + 1).join("/") + "/"
-                          }`
+                          }&commit=${commit}`
                     }
                     className="text-primary"
                   >

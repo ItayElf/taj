@@ -77,8 +77,9 @@ def repos_repos_of(user):
 @app.route("/api/repos/<repo>/files")
 def repos_files(repo):
     directory = request.args.get("directory", default="")
+    commit = request.args.get("commit", default="")
     try:
-        files = get_files_of_repo(repo, directory)
+        files = get_files_of_repo(repo, directory, commit)
         return jsonify(files)
     except FileNotFoundError as e:
         return str(e), 404
@@ -86,8 +87,9 @@ def repos_files(repo):
 
 @app.route("/api/repos/<repo>/file/<path:file>/")
 def repos_get_file(repo, file):
+    commit = request.args.get("commit", "")
     try:
-        return jsonify(get_file_content(repo, file))
+        return jsonify(get_file_content(repo, file, commit))
     except FileNotFoundError as e:
         return str(e), 404
 
