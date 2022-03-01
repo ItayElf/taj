@@ -1,8 +1,8 @@
 import os.path
 from typing import List, Dict, Union, Any
 
-from taj.orm.classes import Repo, FileChange
-from taj.orm.commit import get_commit_by_hash
+from taj.orm.classes import Repo, FileChange, Commit
+from taj.orm.commit import get_commit_by_hash, get_all_commits
 from taj.orm.connections import main_connection, repo_connection, repo_settings
 from taj.orm.file_change import get_all_changes_prior_to, get_full_file_content, get_last_update_commit
 from taj.orm.users import does_user_exist
@@ -60,7 +60,7 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
     directory = directory.replace("\\", os.path.sep)
     r = get_repo(repo)
     conn = repo_connection(r.creator, repo)
-    commit_hash = get_commit_by_hash(conn, commit) if commit else repo_settings(r.creator, repo)["last_commit"]
+    commit_hash = commit if commit else repo_settings(r.creator, repo)["last_commit"]
     c = get_commit_by_hash(conn, commit_hash)
     changes = get_all_changes_prior_to(conn, c.timestamp)
     grouped: Dict[str, List[FileChange]] = {}
@@ -105,6 +105,24 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
             files.add(name)
     conn.close()
     return res
+
+
+def get_all_files(repo: str, commit: str = "") -> Dict[str, bytes]:
+    """Returns all files of the repo, as <filename>: <content>"""
+    r = get_repo(repo)
+    conn = repo_connection(r.creator, repo)
+    commit_hash = commit if commit else repo_settings(r.creator, repo)["last_commit"]
+    c = get_commit_by_hash(conn, commit_hash)
+    changes = get_all_changes_prior_to(conn, c.timestamp)
+    grouped = {}
+    for change in changes:
+        if change.name in grouped:
+            grouped[os.path.normpath(change.name)].append(change)
+        else:
+            grouped[os.path.normpath(change.name)] = [change]
+    for f in grouped:
+        grouped[f] = get_full_file_content(grouped[f])
+    return grouped
 
 
 def is_contributor(username: str, repo: str) -> bool:
@@ -196,3 +214,10 @@ def update_repo(r: Repo):
         else:
             raise FileNotFoundError(f"No user named {c}")
     conn.close()
+
+
+def get_commits_of(name: str) -> List[Commit]:
+    """Returns all commits of a repository"""
+    r = get_repo(name)
+    conn = repo_connection(r.creator, r.name)
+    return get_all_commits(conn)

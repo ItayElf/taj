@@ -2,10 +2,11 @@ import base64
 import io
 import os
 import sys
+from zipfile import ZipFile
 
 from taj.endpoints import app
 from taj.orm.repos import get_all_repos, get_repo, get_repos_of, get_files_of_repo, insert_repo, add_contributor, \
-    get_file_content, update_repo
+    get_file_content, update_repo, get_all_files, get_commits_of
 
 from flask import jsonify, request, send_file
 
@@ -25,7 +26,9 @@ def repos_get_repo(repo):
     if request.method == "GET":
         try:
             r = get_repo(repo)
-            return jsonify(r)
+            commits = [{**c.__dict__, "file_changes": []} for c in get_commits_of(r.name)]
+            a = {**r.__dict__, "commits": commits}
+            return jsonify(a)
         except FileNotFoundError as e:
             return str(e), 404
     elif request.method == "POST":
@@ -108,6 +111,21 @@ def repos_download_file(repo, file):
         return send_file(io.BytesIO(content), as_attachment=True, attachment_filename=name)
     except FileNotFoundError as e:
         return str(e), 404
+
+
+@app.route("/api/repos/<repo>.zip")
+def repos_download_repo(repo):
+    commit = request.args.get("commit", "")
+    try:
+        files = get_all_files(repo, commit)
+    except FileNotFoundError as e:
+        return str(e), 404
+    in_mem = io.BytesIO()
+    archive = ZipFile(in_mem, "w")
+    for file in files:
+        archive.writestr(file, files[file])
+    archive.close()
+    return send_file(io.BytesIO(in_mem.getvalue()), as_attachment=True, attachment_filename=f"{repo}.zip")
 
 
 @app.route("/api/repos/<repo>/edit", methods=["POST"])

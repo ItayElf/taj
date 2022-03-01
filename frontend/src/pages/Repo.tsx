@@ -16,6 +16,7 @@ import {
 } from "react-icons/md";
 import { timeSince, useQuery, useSame, useTitle } from "../utils/funcs";
 import { useAppSelector } from "../redux/hooks";
+import JsFileDownloader from "js-file-downloader";
 
 export default function RepoPage() {
   const [repoData, setRepoData] = useState<Repo | null | undefined>(null);
@@ -28,6 +29,7 @@ export default function RepoPage() {
   const { username, token } = useAppSelector((state) => state.userData);
   const query = useQuery();
   const directory = query.get("dir") ?? "";
+  const commit = query.get("commit") ?? "";
   let dirArr = directory.split("/");
   dirArr.pop();
   dirArr = [repo ?? "", ...dirArr];
@@ -117,6 +119,12 @@ export default function RepoPage() {
     }
   };
 
+  const downloadRepo = async () => {
+    new JsFileDownloader({
+      url: apiUrl + `repos/${repo}.zip?commit=${commit}`,
+    });
+  };
+
   if (repoData === null) {
     return (
       <div>
@@ -179,10 +187,12 @@ export default function RepoPage() {
                 ))}
                 <span>{last}</span>
               </div>
-              <button className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white">
-                Code
+              <button
+                onClick={downloadRepo}
+                className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white"
+              >
+                Download Repo
               </button>
-              {/* // TODO: add dropdown with download options */}
             </div>
             <div className="border-secondary mt-5 flex flex-col rounded border">
               <div className="bg-secondary flex flex-row justify-between px-4 py-2">
@@ -312,8 +322,8 @@ export default function RepoPage() {
               </div>
               <div className="flex flex-row flex-wrap space-x-3">
                 {repoData.contributors.map((c) => (
-                  <div className="flex flex-col items-center">
-                    <Link to={`/user/${c}`} key={c}>
+                  <div className="flex flex-col items-center" key={c}>
+                    <Link to={`/user/${c}`}>
                       <div className="flex flex-col items-center">
                         <img
                           src={`/user/${c}/profile_pic`}

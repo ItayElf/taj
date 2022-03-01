@@ -3,6 +3,7 @@ export interface Repo {
   description: string;
   creator: string;
   contributors: string[];
+  commits: Commit[];
 }
 
 export interface RepoFile {
