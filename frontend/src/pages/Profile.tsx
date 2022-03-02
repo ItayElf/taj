@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";

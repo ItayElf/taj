@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import SyntaxHighlighter from "react-syntax-highlighter/dist/esm/default-highlight";
 import { atelierDuneLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import Footer from "../component/Footer";
@@ -8,14 +8,17 @@ import NotFound from "../component/NotFound";
 import { apiUrl } from "../constants";
 import { get } from "../utils/fetchUtils";
 import { getBytesSize, useQuery, useTitle } from "../utils/funcs";
-import { FileMetadata } from "../utils/interfaces";
+import { Commit, FileMetadata, Repo } from "../utils/interfaces";
 import JsFileDownloader from "js-file-downloader";
 
 export function FileView() {
   const [fileData, setFileData] = useState<FileMetadata | null | undefined>(
     null
   );
+  const [repoData, setRepoData] = useState<Repo | null>(null);
+  const [lastCommit, setLastCommit] = useState<Commit | null>(null);
   const { repo } = useParams();
+  const navigate = useNavigate();
   const map = require("lang-map");
   const query = useQuery();
   const file = query.get("file") ?? "";
@@ -32,23 +35,33 @@ export function FileView() {
   useEffect(() => {
     async function getFile() {
       const res = await get(apiUrl + `repos/${repo}/file/${file}`, { commit });
-      try {
-        setFileData(JSON.parse(await res.text()) as FileMetadata);
-      } catch (e) {
+      if (res.ok) {
+        try {
+          setFileData(JSON.parse(await res.text()) as FileMetadata);
+        } catch (e) {
+          setFileData(undefined);
+          return;
+        }
+      } else {
         setFileData(undefined);
-        return;
       }
+      const res2 = await get(apiUrl + `repos/${repo}`, {});
+      const text = await res2.text();
+      setRepoData(JSON.parse(text));
+      setLastCommit((JSON.parse(text) as Repo).commits[0]);
     }
     getFile();
-  }, [file, repo]);
+  }, [file, repo, commit]);
 
   async function download() {
     // const res = await get(apiUrl + `repos/${repo}/file/${file}`, {});
     // const blob = await res.blob();
-    new JsFileDownloader({ url: apiUrl + `repos/${repo}/download/${file}` });
+    new JsFileDownloader({
+      url: apiUrl + `repos/${repo}/download/${file}?commit=${commit}`,
+    });
   }
 
-  if (fileData === null) {
+  if (fileData === null || repoData === null) {
     return (
       <div>
         <Header />
@@ -76,10 +89,19 @@ export function FileView() {
       <div className="min-h-full-main px-20 pt-10">
         <div className="container">
           <div className="flex justify-between">
-            <button className="bg-secondary hover:bg-secondary/80 text-primary-dark block rounded py-2 px-4 text-center font-bold">
-              COMMITNAME
-            </button>
-            {/* // TODO: add dropdown with commits */}
+            <select
+              className="bg-secondary hover:bg-secondary/80 text-primary-dark block rounded py-2 pl-4 text-left font-bold"
+              value={commit || lastCommit?.hash}
+              onChange={(e) =>
+                navigate(
+                  `/repo/${repo}/file?file=${file}&commit=${e.target.value}`
+                )
+              }
+            >
+              {repoData.commits.map((c) => (
+                <option value={c.hash}>{c.message}</option>
+              ))}
+            </select>
             <div className="flex text-3xl">
               {dirArr.map((d, i) => (
                 <div key={i}>

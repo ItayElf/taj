@@ -105,8 +105,9 @@ def repos_serve_image(repo, image):
 
 @app.route("/api/repos/<repo>/download/<path:file>")
 def repos_download_file(repo, file):
+    commit = request.args.get("commit", "")
     try:
-        metadata = get_file_content(repo, file)
+        metadata = get_file_content(repo, file, commit)
         content = metadata["content"]
         content = b"".fromhex(content) if metadata["binary"] else content.encode()
         name = os.path.normpath(file).split(os.path.sep)[-1]

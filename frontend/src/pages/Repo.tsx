@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";
@@ -28,6 +28,7 @@ export default function RepoPage() {
   const { repo } = useParams();
   const { username, token } = useAppSelector((state) => state.userData);
   const query = useQuery();
+  const navigate = useNavigate();
   const directory = query.get("dir") ?? "";
   const commit = query.get("commit") ?? "";
   let dirArr = directory.split("/");
@@ -44,7 +45,9 @@ export default function RepoPage() {
         repo,
       });
       try {
-        setRepoData(JSON.parse(await res.text()));
+        const text = await res.text();
+        setRepoData(JSON.parse(text));
+        setLastCommit((JSON.parse(text) as Repo).commits[0]);
       } catch (e) {
         setRepoData(undefined);
         return;
@@ -60,13 +63,6 @@ export default function RepoPage() {
         return;
       }
       setRepoFiles(files);
-      setLastCommit(
-        !!files
-          ? files.reduce((p, c) =>
-              p.commit.timestamp > c.commit.timestamp ? p : c
-            ).commit
-          : null
-      );
     }
     checkRepo();
   }, [repo, directory, commit]);
@@ -141,7 +137,11 @@ export default function RepoPage() {
         <Footer />
       </div>
     );
-  } else if (!repoData) {
+  } else if (
+    !repoData ||
+    (commit !== "" &&
+      repoData.commits.map((c) => c.hash).indexOf(commit) === -1)
+  ) {
     return (
       <div>
         <Header />
@@ -167,10 +167,19 @@ export default function RepoPage() {
           </div>
           <div className="flex w-full flex-col px-5">
             <div className="flex justify-between">
-              <button className="bg-secondary hover:bg-secondary/80 text-primary-dark block rounded py-2 px-4 text-center font-bold">
-                COMMITNAME
-              </button>
-              {/* // TODO: add dropdown with commits */}
+              <select
+                className="bg-secondary hover:bg-secondary/80 text-primary-dark block rounded py-2 pl-4 text-left font-bold"
+                value={commit || lastCommit?.hash}
+                onChange={(e) =>
+                  navigate(
+                    `/repo/${repo}?dir=${directory}&commit=${e.target.value}`
+                  )
+                }
+              >
+                {repoData.commits.map((c) => (
+                  <option value={c.hash}>{c.message}</option>
+                ))}
+              </select>
               <div className="flex text-3xl">
                 {dirArr.map((d, i) => (
                   <div key={i}>
