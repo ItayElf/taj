@@ -3,6 +3,7 @@ import random
 import sqlite3
 import time
 import zlib
+from typing import List
 
 from taj.orm.connections import main_connection, ROOT_PATH
 from hashlib import md5
@@ -127,3 +128,14 @@ def validate_token(name: str, token: str) -> bool:
 def _generate_token() -> str:
     """Returns a random string for auth token"""
     return "".join(random.choices(_pool, k=16))
+
+
+def search_users(query: str) -> List[str]:
+    """Returns a list of usernames that match the given query"""
+    conn = main_connection()
+    c = conn.cursor()
+    query = f"%{query}%"
+    c.execute("SELECT username FROM users WHERE username LIKE ?", (query,))
+    lst = c.fetchall()
+    conn.close()
+    return [u[0] for u in lst]

@@ -96,8 +96,9 @@ def repos_get_file(repo, file):
 
 @app.route("/api/repos/<repo>/image/<path:image>")
 def repos_serve_image(repo, image):
+    commit = request.args.get("commit", "")
     try:
-        img = b"".fromhex(get_file_content(repo, image)["content"])
+        img = b"".fromhex(get_file_content(repo, image, commit)["content"])
         return send_file(io.BytesIO(img), mimetype="image/jpg")
     except FileNotFoundError as e:
         return str(e), 404

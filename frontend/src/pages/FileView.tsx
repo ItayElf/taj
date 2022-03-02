@@ -149,7 +149,10 @@ export function FileView() {
               </SyntaxHighlighter>
             ) : imgs.indexOf(ext) !== -1 ? (
               <div className="flex w-full justify-center p-4">
-                <img src={apiUrl + `repos/${repo}/image/${file}`} alt="" />
+                <img
+                  src={apiUrl + `repos/${repo}/image/${file}?commit=${commit}`}
+                  alt=""
+                />
               </div>
             ) : (
               <div className="p-4 text-center text-3xl">Binary File</div>

@@ -26,6 +26,16 @@ JOIN users u2 ON u2.id = r.creator_id
 GROUP BY r.name;
 """
 
+_get_repo_query = """
+SELECT r.name, r.description, u2.username ,GROUP_CONCAT(u.username) 
+FROM repos r 
+LEFT JOIN users_repos ur ON ur.repo_id = r.id
+LEFT JOIN users u ON ur.user_id = u.id
+JOIN users u2 ON u2.id = r.creator_id 
+WHERE r.name LIKE ?
+GROUP BY r.name;
+"""
+
 
 def get_repo(name: str) -> Repo:
     """Returns a repo based on its name"""
@@ -220,4 +230,17 @@ def get_commits_of(name: str) -> List[Commit]:
     """Returns all commits of a repository"""
     r = get_repo(name)
     conn = repo_connection(r.creator, r.name)
-    return get_all_commits(conn)
+    commits = get_all_commits(conn)
+    conn.close()
+    return commits
+
+
+def search_repos(query: str) -> List[Repo]:
+    """Returns all repos that match the given query"""
+    conn = main_connection()
+    c = conn.cursor()
+    query = f"%{query}%"
+    c.execute(_get_repo_query, (query,))
+    lst = c.fetchall()
+    conn.close()
+    return [Repo(tup[0], tup[1], tup[2], tup[3].split(",")) for tup in lst]
