@@ -78,6 +78,8 @@ export default function RepoPage() {
       setEditDesc(null);
       setRepoData(JSON.parse(await res.text()));
       setError("");
+    } else if (res.status === 403) {
+      navigate("/signIn");
     } else {
       setError(await res.text());
     }
@@ -95,6 +97,8 @@ export default function RepoPage() {
     });
     if (res.ok) {
       setRepoData(JSON.parse(await res.text()));
+    } else if (res.status === 403) {
+      navigate("/signIn");
     } else {
       alert(await res.text());
     }
@@ -114,6 +118,8 @@ export default function RepoPage() {
     });
     if (res.ok) {
       setRepoData(JSON.parse(await res.text()));
+    } else if (res.status === 403) {
+      navigate("/signIn");
     } else {
       alert(await res.text());
     }
@@ -138,7 +144,7 @@ export default function RepoPage() {
       </div>
     );
   } else if (
-    !repoData ||
+    repoData === undefined ||
     (commit !== "" &&
       repoData.commits.map((c) => c.hash).indexOf(commit) === -1)
   ) {
@@ -150,7 +156,7 @@ export default function RepoPage() {
       </div>
     );
   }
-
+  console.log({ repoData });
   return (
     <div>
       <Header />
@@ -177,7 +183,9 @@ export default function RepoPage() {
                 }
               >
                 {repoData.commits.map((c) => (
-                  <option value={c.hash}>{c.message}</option>
+                  <option value={c.hash} key={c.hash}>
+                    {c.message}
+                  </option>
                 ))}
               </select>
               <div className="flex text-3xl">

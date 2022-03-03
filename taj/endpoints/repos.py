@@ -158,4 +158,7 @@ def repos_edit_repo(repo):
         update_repo(r)
     except FileNotFoundError as e:
         return str(e), 404
-    return jsonify(r)
+    r = get_repo(r.name)
+    commits = [{**c.__dict__, "file_changes": []} for c in get_commits_of(r.name)]
+    a = {**r.__dict__, "commits": commits}
+    return jsonify(a)

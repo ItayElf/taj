@@ -88,9 +88,9 @@ export function Search() {
                 : results.users.length + " users"}
             </h2>
             {repos
-              ? results.repos.map((r) => <RepoTile repo={r} />)
+              ? results.repos.map((r) => <RepoTile repo={r} key={r.name} />)
               : results.users.map((c) => (
-                  <div className="flex items-center space-x-2 p-4">
+                  <div className="flex items-center space-x-2 p-4" key={c}>
                     <img
                       src={`/user/${c}/profile_pic`}
                       className="border-primary h-10 w-10 max-w-none rounded-full border-2"

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Footer from "../component/Footer";
 import Header from "../component/Header";
 import NotFound from "../component/NotFound";
@@ -18,6 +18,7 @@ export default function Profile() {
   const inputFile = useRef<HTMLInputElement>(null);
   const { username } = useParams();
   const { same } = useSame(username ?? "");
+  const navigate = useNavigate();
   const { username: loggedUser, token } = useAppSelector(
     (state) => state.userData
   );
@@ -61,12 +62,17 @@ export default function Profile() {
     }
     const text = inputFile.current.files[0];
     const fileBase64 = await blobToBase64(text);
-    await post(apiUrl + "auth/set_profile_pic", {
+    const res = await post(apiUrl + "auth/set_profile_pic", {
       username,
       token,
       file: fileBase64,
     });
-    window.location.reload();
+    console.log(res.status);
+    if (res.status === 403) {
+      navigate("/signIn");
+    } else {
+      window.location.reload();
+    }
   };
 
   if (found === null) {
