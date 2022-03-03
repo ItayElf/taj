@@ -31,4 +31,7 @@ export interface FileMetadata {
   size: number;
 }
 
-export interface LanguageDict {}
+export interface SearchReasults {
+  repos: Repo[];
+  users: string[];
+}

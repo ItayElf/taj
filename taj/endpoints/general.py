@@ -12,4 +12,4 @@ def general_search():
     query = request.args.get("query")
     users = search_users(query)
     repos = search_repos(query)
-    return jsonify({"users": users, "repos": repos})
+    return jsonify({"users": sorted(users), "repos": sorted(repos, key=lambda x: x.name)})

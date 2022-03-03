@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiUrl } from "../constants";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setToken, setUsername } from "../redux/userData";
@@ -8,10 +8,10 @@ import Logo from "./Logo";
 
 export default function Header() {
   const { username, token } = useAppSelector((state) => state.userData);
-  // const username = getInitial<string>("username");
-  // const token = getInitial<string>("token");
+  const [query, setQuery] = useState("");
   const [logged, setLogged] = useState(false);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     if (!username || !token) {
       return;
@@ -70,13 +70,24 @@ export default function Header() {
                 <path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path>
               </svg>
             </div>
-            <input
-              type="text"
-              name="search"
-              id="search"
-              placeholder="Search..."
-              className=" placeholder-primary-dark bg-secondary-semi-dark w-60 rounded-lg border-none focus:ring-transparent"
-            />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (query !== "") {
+                  navigate(`/search?query=${query}`);
+                }
+              }}
+            >
+              <input
+                type="text"
+                name="search"
+                id="search"
+                placeholder="Search..."
+                value={query}
+                className=" placeholder-primary-dark bg-secondary-semi-dark w-60 rounded-lg border-none focus:ring-transparent"
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </form>
           </div>
           {logged ? (
             <div className="flex flex-shrink-0 space-x-6">
