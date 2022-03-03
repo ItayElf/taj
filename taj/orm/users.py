@@ -100,7 +100,7 @@ def add_token_if_not_exists(name: str) -> str:
         return tup[0]
     while not done:
         t = _generate_token()
-        tstamp = int(time.time()) + _interval
+        tstamp = int(time.time()) + interval
         try:
             conn.execute(_insert_token, (t, tstamp, name))
             conn.commit()

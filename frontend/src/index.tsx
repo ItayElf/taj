@@ -14,6 +14,7 @@ import NotFound from "./component/NotFound";
 import Footer from "./component/Footer";
 import { FileView } from "./pages/FileView";
 import { Search } from "./pages/Search";
+import { LearnMore } from "./pages/LearnMore";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -30,6 +31,7 @@ ReactDOM.render(
           <Route path="/repo/:repo" element={<RepoPage />} />
           <Route path="/repo/:repo/file" element={<FileView />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/learnMore" element={<LearnMore />} />
           <Route
             path="*"
             element={

@@ -10,7 +10,7 @@ import { SearchReasults } from "../utils/interfaces";
 
 export function Search() {
   const [results, setResults] = useState<SearchReasults | null>(null);
-  const [repos, setRepos] = useState(false);
+  const [repos, setRepos] = useState(true);
   const query = useQuery();
   const searchQuery = query.get("query") ?? "";
 

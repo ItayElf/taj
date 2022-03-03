@@ -29,10 +29,9 @@ function App() {
                     Get started
                   </Link>
                 </div>
-
                 <div className="mt-3 sm:mt-0 sm:ml-3">
                   <Link
-                    to="#"
+                    to="/learnMore"
                     className="bg-primary-extra-light text-primary hover:bg-primary-extra-light/80 flex w-full items-center justify-center rounded-md border border-transparent py-4 px-10 text-xl font-medium"
                   >
                     Learn More

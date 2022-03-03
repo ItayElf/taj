@@ -51,7 +51,7 @@ export default function Header() {
               Home
             </Link>
             <Link
-              to="#"
+              to="/search"
               className="bg-secondary-dark hover:bg-secondary-semi-dark rounded-md px-3 py-2 text-lg font-medium"
             >
               Explore
