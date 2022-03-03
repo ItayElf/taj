@@ -11,7 +11,7 @@ from string import ascii_letters, digits
 
 _pool = ascii_letters + digits
 _blank_profile_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blank profile.jpg")
-_interval = 172800  # Two hours
+interval = 172800  # Two days
 
 _insert_token = """
 INSERT INTO tokens(user_id, token, tstamp)
@@ -139,3 +139,20 @@ def search_users(query: str) -> List[str]:
     lst = c.fetchall()
     conn.close()
     return [u[0] for u in lst]
+
+
+def revoke_token(username) -> None:
+    """Revokes all tokens used by a user"""
+    conn = main_connection()
+    conn.execute("DELETE FROM tokens WHERE user_id=(SELECT u.id FROM users u WHERE u.username=?)", (username,))
+    conn.commit()
+    conn.close()
+
+
+def clean_tokens() -> None:
+    """Removes all expires tokens"""
+    conn = main_connection()
+    now = int(time.time())
+    conn.execute("DELETE FROM tokens WHERE tstamp < ?", (now,))
+    conn.commit()
+    conn.close()

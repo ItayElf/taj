@@ -2,7 +2,7 @@ import base64
 
 from taj.endpoints import app
 from taj.orm.users import validate_user, insert_user, does_user_exist, validate_token, add_token_if_not_exists, \
-    set_profile_pic
+    set_profile_pic, revoke_token
 from flask import request, jsonify
 
 
@@ -68,4 +68,16 @@ def auth_set_profile_pic():
         return "No image was added", 400
     file: str = request.json.get("file").split(",")[1]
     set_profile_pic(username, base64.b64decode(file))
+    return "", 200
+
+
+@app.route("/api/auth/revoke_token", methods=["POST"])
+def auth_revoke_token():
+    if "username" not in request.json or "token" not in request.json:
+        return "Missing username or token in json", 400
+    username = request.json.get("username")
+    token = request.json.get("token")
+    if not validate_token(username, token):
+        return "Invalid or expired token", 403
+    revoke_token(username)
     return "", 200

@@ -1,7 +1,10 @@
+import threading
+import time
+
 from flask import send_from_directory
 from taj.endpoints import *
 from taj.orm import init_db
-from taj.orm.users import get_profile_pic
+from taj.orm.users import get_profile_pic, clean_tokens, interval
 
 
 @app.route("/", defaults={'path': ''})
@@ -29,6 +32,13 @@ def user_profile_pic(user):
         return str(e), 404
 
 
+def clean():
+    while True:
+        clean_tokens()
+        time.sleep(interval)
+
+
 if __name__ == "__main__":
     init_db()
+    threading.Thread(target=clean, daemon=True).start()
     app.run(debug=True, threaded=True, host="0.0.0.0", ssl_context=("cert.pem", "key.pem"))

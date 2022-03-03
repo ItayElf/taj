@@ -75,6 +75,11 @@ export default function Profile() {
     }
   };
 
+  const revoke = async () => {
+    await post(apiUrl + "auth/revoke_token", { username, token });
+    navigate("/signIn");
+  };
+
   if (found === null) {
     return (
       <div>
@@ -124,16 +129,14 @@ export default function Profile() {
             </button>
           )}
           <h1 className="text-primary-dark/90 text-2xl">{username}</h1>
-          {/* {same ? (
-            <Link
-              to="#"
+          {same && (
+            <button
+              onClick={revoke}
               className="bg-primary hover:bg-primary/80 block rounded py-2 px-4 text-center font-bold text-white"
             >
-              Edit Profile
-            </Link>
-          ) : (
-            <div></div>
-          )} */}
+              Revoke Token
+            </button>
+          )}
         </div>
         <div className="divide-secondary flex w-full flex-col space-y-4 divide-y">
           <input
