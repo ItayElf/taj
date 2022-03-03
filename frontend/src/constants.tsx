@@ -1,1 +1,1 @@
-export const apiUrl = "https://192.168.1.16:5000/api/";
+export const apiUrl = "https://127.0.0.1:5000/api/";
