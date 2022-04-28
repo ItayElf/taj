@@ -39,6 +39,10 @@ class Commit:
         self.hash = md5((f"{self.author}{self.message}{self.last_commit_hash}{self.timestamp}".encode())).hexdigest()
 
 
+class DeleteFileException(Exception):
+    """Exception that tells whether a file was deleted"""
+
+
 @dataclass
 class CFSimplified:
     """A simplified CF implementation specific only for reading"""
@@ -57,7 +61,7 @@ class CFSimplified:
             elif isinstance(change, Append):
                 lst.insert(change.index, ord(change.value))
             elif isinstance(change, Delete):
-                raise FileNotFoundError("Delete Change")
+                raise DeleteFileException("Delete Change")
         return b"".join([chr(val).encode() for val in lst])
 
     @classmethod

@@ -46,18 +46,21 @@ export default function RepoPage() {
       });
       try {
         const text = await res.text();
-        setRepoData(JSON.parse(text));
-        setLastCommit((JSON.parse(text) as Repo).commits[0]);
+        const parsed: Repo = JSON.parse(text);
+        console.log(parsed);
+        setRepoData(parsed);
+        setLastCommit(parsed.commits[0]);
       } catch (e) {
         setRepoData(undefined);
         return;
       }
-      console.log({ commit });
       const res2 = await get(apiUrl + `repos/${repo}/files`, {
         directory,
         commit,
       });
-      const files = JSON.parse(await res2.text()) as RepoFile[];
+      const text2 = await res2.text();
+      console.log({ text2 });
+      const files = JSON.parse(text2) as RepoFile[];
       if (files.length === 0) {
         setRepoData(undefined);
         return;
@@ -156,7 +159,7 @@ export default function RepoPage() {
       </div>
     );
   }
-  console.log({ repoData });
+
   return (
     <div>
       <Header />

@@ -56,7 +56,6 @@ export default function Profile() {
     if (inputFile.current === null) {
       return;
     }
-    console.log(inputFile.current.files);
     if (inputFile.current.files == null) {
       return;
     }
@@ -67,7 +66,6 @@ export default function Profile() {
       token,
       file: fileBase64,
     });
-    console.log(res.status);
     if (res.status === 403) {
       navigate("/signIn");
     } else {

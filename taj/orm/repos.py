@@ -1,7 +1,7 @@
 import os.path
 from typing import List, Dict, Union, Any
 
-from taj.orm.classes import Repo, FileChange, Commit
+from taj.orm.classes import Repo, FileChange, Commit, DeleteFileException
 from taj.orm.commit import get_commit_by_hash, get_all_commits
 from taj.orm.connections import main_connection, repo_connection, repo_settings
 from taj.orm.file_change import get_all_changes_prior_to, get_full_file_content, get_last_update_commit
@@ -89,6 +89,7 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
             name = rel.split(os.path.sep)[0]
             if name in files:
                 continue
+            deleted = False
             if os.path.sep in rel:
                 res.append({
                     "name": name,
@@ -98,20 +99,23 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
                     "commit": last_commits[file]
                 })
             else:
-                content = get_full_file_content(grouped[file])
-                binary = False
                 try:
-                    content = content.decode("utf-8")
-                except UnicodeDecodeError:
-                    content = content.hex()
-                    binary = True
-                res.append({
-                    "name": name,
-                    "type": "file",
-                    "content": content,
-                    "binary": binary,
-                    "commit": last_commits[file],
-                })
+                    content = get_full_file_content(grouped[file])
+                    binary = False
+                    try:
+                        content = content.decode("utf-8")
+                    except UnicodeDecodeError:
+                        content = content.hex()
+                        binary = True
+                    res.append({
+                        "name": name,
+                        "type": "file",
+                        "content": content,
+                        "binary": binary,
+                        "commit": last_commits[file],
+                    })
+                except DeleteFileException:
+                    deleted = True
             files.add(name)
     conn.close()
     return res
