@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 import os
 import sys
 from zipfile import ZipFile
@@ -47,7 +48,13 @@ def repos_get_repo(repo):
         new = request.json.get("new")
         if not request.json["db"] or not request.json["settings"]:
             return "Invalid files (db or settings)", 400
-        dir_path = os.path.join(ROOT_PATH, "dbs", "users", username, repo)
+        if not new:
+            r = get_repo(repo)
+            if username not in r.contributors:
+                return "Cannot push to repo you don't own", 403
+            dir_path = os.path.join(ROOT_PATH, "dbs", "users", r.creator, repo)
+        else:
+            dir_path = os.path.join(ROOT_PATH, "dbs", "users", username, repo)
         # try:
         if not os.path.isdir(dir_path):
             if not new:
@@ -161,4 +168,34 @@ def repos_edit_repo(repo):
     r = get_repo(r.name)
     commits = [{**c.__dict__, "file_changes": []} for c in get_commits_of(r.name)]
     a = {**r.__dict__, "commits": commits}
+    return jsonify(a)
+
+
+@app.route("/api/repos/<repo>/pull", methods=["POST"])
+def repos_pull_repo(repo):
+    if "username" not in request.json or "token" not in request.json:
+        return "Missing username or token in json", 400
+    username = request.json.get("username")
+    token = request.json.get("token")
+    if not does_user_exist(username):
+        return f"User {username} was not found", 404
+    if not validate_token(username, token):
+        return "Token is incorrect or expired", 403
+    try:
+        r = get_repo(repo)
+    except FileNotFoundError as e:
+        return str(e), 404
+    if username not in r.contributors:
+        return "Cannot pull repository you are not a contributor of", 403
+    repo_dir = os.path.join(ROOT_PATH, "dbs", "users", r.creator, r.name)
+    with open(os.path.join(repo_dir, "settings.json")) as f:
+        settings = json.load(f)
+        settings["token"] = ""
+        settings["username"] = ""
+    with open(os.path.join(repo_dir, "db.db"), "rb") as f:
+        db = f.read().hex()
+    a = {
+        "settings": settings,
+        "db": db,
+    }
     return jsonify(a)
