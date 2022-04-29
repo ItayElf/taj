@@ -98,8 +98,10 @@ export function FileView() {
                 )
               }
             >
-              {repoData.commits.map((c) => (
-                <option value={c.hash}>{c.message}</option>
+              {repoData.commits.map((c, i) => (
+                <option value={c.hash} key={i}>
+                  {c.message}
+                </option>
               ))}
             </select>
             <div className="flex text-3xl">

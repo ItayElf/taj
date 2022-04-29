@@ -47,7 +47,6 @@ export default function RepoPage() {
       try {
         const text = await res.text();
         const parsed: Repo = JSON.parse(text);
-        console.log(parsed);
         setRepoData(parsed);
         setLastCommit(parsed.commits[0]);
       } catch (e) {
@@ -59,7 +58,6 @@ export default function RepoPage() {
         commit,
       });
       const text2 = await res2.text();
-      console.log({ text2 });
       const files = JSON.parse(text2) as RepoFile[];
       if (files.length === 0) {
         setRepoData(undefined);
