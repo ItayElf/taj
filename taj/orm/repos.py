@@ -89,15 +89,22 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
             name = rel.split(os.path.sep)[0]
             if name in files:
                 continue
-            deleted = False
             if os.path.sep in rel:
-                res.append({
-                    "name": name,
-                    "type": "dir",
-                    "content": "",
-                    "binary": False,
-                    "commit": last_commits[file]
-                })
+                lst = []
+                for f in grouped:
+                    if f.startswith(os.path.join(directory, name)):
+                        try:
+                            lst.append(get_full_file_content(grouped[f]))
+                        except DeleteFileException:
+                            ...
+                if lst:
+                    res.append({
+                        "name": name,
+                        "type": "dir",
+                        "content": "",
+                        "binary": False,
+                        "commit": last_commits[file]
+                    })
             else:
                 try:
                     content = get_full_file_content(grouped[file])
@@ -115,7 +122,7 @@ def get_files_of_repo(repo: str, directory: str = "", commit: str = "") -> List[
                         "commit": last_commits[file],
                     })
                 except DeleteFileException:
-                    deleted = True
+                    ...
             files.add(name)
     conn.close()
     return res
