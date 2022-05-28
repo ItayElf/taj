@@ -49,25 +49,28 @@ def repos_get_repo(repo):
         if not request.json["db"] or not request.json["settings"]:
             return "Invalid files (db or settings)", 400
         if not new:
-            r = get_repo(repo)
-            if username not in r.contributors:
-                return "Cannot push to repo you don't own", 403
-            dir_path = os.path.join(ROOT_PATH, "dbs", "users", r.creator, repo)
+            try:
+                r = get_repo(repo)
+                if username not in r.contributors:
+                    return "Cannot push to repo you don't own", 403
+                dir_path = os.path.join(ROOT_PATH, "dbs", "users", r.creator, repo)
+            except FileNotFoundError as e:
+                return str(e), 404
         else:
             dir_path = os.path.join(ROOT_PATH, "dbs", "users", username, repo)
-        # try:
-        if not os.path.isdir(dir_path):
-            if not new:
-                return f"No repository with name {repo} was found.", 404
-            os.mkdir(dir_path)
-            insert_repo(username, repo)
-        elif new:
-            return f"Repository with name {repo} already exists.", 406
-        elif username not in get_repo(repo).contributors:
-            return "You are not a contributor of this repo", 403
-        add_contributor(username, repo)
-        # except FileNotFoundError as e:
-        #     return str(e), 404
+        try:
+            if not os.path.isdir(dir_path):
+                if not new:
+                    return f"No repository with name {repo} was found.", 404
+                os.mkdir(dir_path)
+                insert_repo(username, repo)
+            elif new:
+                return f"Repository with name {repo} already exists.", 406
+            elif username not in get_repo(repo).contributors:
+                return "You are not a contributor of this repo", 403
+            add_contributor(username, repo)
+        except FileNotFoundError as e:
+            return str(e), 404
         with open(os.path.join(dir_path, "db.db"), "wb+") as f:
             f.write(base64.b64decode(b"".fromhex(request.json["db"])))
         with open(os.path.join(dir_path, "settings.json"), "wb+") as f:
